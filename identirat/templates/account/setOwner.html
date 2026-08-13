@@ -1,0 +1,40 @@
+<div class="flex items-center mb-6">
+    <div class="flex-1">
+        <button hx-get="/admin/accounts" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+            type="submit" class="bg-gray-500 hover:bg-gray-400 py-2 px-4 mx-2 border-b-4 border-gray-700 hover:border-gray-500 rounded text-sm text-white font-bold ">
+            Volver </button>
+    </div>
+    <div class="flex-none pb-2">
+        <h1 class="text-2xl text-gray-700 font-bold text-center">Asignar propietario</h1>
+        <p class="font-normal text-m text-gray-400 md:px-2 py-2 text-center">{{.Username}}</p>
+    </div>
+    <div class="flex-1">
+    </div>
+</div>
+<div class="flex flex-wrap -mx-3 mb-3">
+    <div class="w-full px-3 mb-6 md:mb-0">
+        <label for="owner_uuid" class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+            Propietario </label>
+        {{if .owners}}
+        <form hx-post="/admin/setOwner" hx-target="#content-div" hx-trigger="submit" hx-swap="innerHTML">
+            <input type="hidden" id="acc_id" name="acc_id" value="{{.AccountID}}">
+            <select id="owner_uuid" name="owner_uuid"
+                class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200">
+                <option disabled {{if not .OwnerUUID}} selected{{end}} value> -- Buscar... -- </option>
+                {{range .owners}}
+                <option value="{{.UUID}}"{{if eq .UUID.String $.OwnerUUID}} selected{{end}}>{{.DisplayName}}</option>
+                {{end}}
+            </select>
+            <div class="container flex justify-center mt-6">
+                <div class="flex flex-row mx-auto">
+                    <button type="submit"
+                        class="bg-green-500 hover:bg-green-400 py-2 px-4 mx-2 border-b-4 border-green-600 hover:border-green-400 rounded text-white font-bold">
+                        Guardar </button>
+                </div>
+            </div>
+        </form>
+        {{else}}
+        <p class="text-gray-400"> Este tipo de cuenta no tiene propietarios disponibles. </p>
+        {{end}}
+    </div>
+</div>

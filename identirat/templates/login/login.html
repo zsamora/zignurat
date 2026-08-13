@@ -1,0 +1,21 @@
+<div class="w-full max-w-6xl mt-24 flex justify-center">
+  <form class="w-full bg-white max-w-sm shadow-xl rounded py-12 px-16" hx-post="/loginForm" hx-trigger="submit" hx-target="#html-all" hx-swap="outerHTML">
+    <div class="mt-4 mb-6">
+      <label class="uppercase block text-gray-700 text-sm font-bold mb-2" for="user">
+          Usuario</label>
+      <input id="user" name="user" type="text" placeholder="Ej: organizacion@mail.com"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+    </div>
+    <div class="mb-6">
+      <label class="uppercase block text-gray-700 text-sm font-bold mb-2" for="password">
+          Contraseña </label>
+      <input id="password" name="password" type="password" placeholder="********"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" >
+    </div>
+    <div class="flex justify-center items-center mt-9">
+      <button 
+          class="w-5/6 px-4 py-2 bg-sky-600 hover:bg-sky-500 px-4 border-b-4 border-sky-300 hover:border-sky-200 text-sm font-bold text-white rounded">
+        Ingresar </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,15 @@
+# Secrets / environment
+.env
+
+# Compiled Go binaries
+/identirat/identirat
+/identirat/identirat-app
+
+# IDE, AI and OS
+.idea/
+.vscode/
+.claude/
+*.iml
+.mcp.json
+.DS_Store
+Thumbs.db

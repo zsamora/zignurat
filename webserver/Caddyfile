@@ -1,0 +1,3 @@
+http://identirat.localhost {
+    reverse_proxy identirat-app:9000
+}

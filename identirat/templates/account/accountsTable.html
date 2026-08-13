@@ -1,0 +1,67 @@
+{{define "accountsTable"}}
+<div class="relative flex flex-col w-full h-full overflow-scroll text-gray-700 bg-white shadow-md rounded-lg bg-clip-border mb-3">
+    <table class="w-full text-left table-auto min-w-max">
+        <thead>
+        <tr>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    ID
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Nombre de Usuario
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Contraseña
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Usuario/Organización
+                </p>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {{range .accounts}}
+            <tr class="hover:bg-slate-50">
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="font-bold text-xs text-slate-500">{{.ID}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500">{{.Username}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <form hx-post="/admin/changePassword" hx-target="#content-div" hx-swap="innerHTML">
+                        <input type="hidden" id="acc_id" name="acc_id" value="{{.ID}}">
+                        <button type="submit"
+                                class="text-white font-bold bg-blue-500 hover:bg-blue-400 py-2 px-4 mx-2 border-b-4 border-blue-700 hover:border-blue-500 rounded">
+                            Cambiar </button>
+                    </form>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <form hx-post="/admin/updateSetOwner" hx-target="#content-div" hx-swap="innerHTML">
+                        <input type="hidden" id="acc_id" name="acc_id" value="{{.ID}}">
+                        {{if .OwnerUUID}}
+                        <input type="hidden" id="owner_uuid" name="owner_uuid" value="{{.OwnerUUID}}">
+                        <input type="hidden" id="acc_role" name="acc_role" value="{{.AccRole}}">
+                        <button type="submit"
+                                class="text-white font-bold bg-violet-500 hover:bg-violet-400 py-2 px-4 mx-2 border-b-4 border-violet-700 hover:border-violet-500 rounded">
+                            Ver </button>
+                        {{else}}
+                        <button type="submit"
+                                class="text-white font-bold bg-emerald-500 hover:bg-emerald-400 py-2 px-4 mx-2 border-b-4 border-emerald-700 hover:border-emerald-500 rounded">
+                            Establecer </button>
+                        {{end}}
+                    </form>
+                </td>
+            </tr>
+        {{end}}
+        </tbody>
+    </table>
+</div>
+{{end}}
+{{template "accountsTable" .}}

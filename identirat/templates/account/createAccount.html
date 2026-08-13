@@ -1,0 +1,93 @@
+<!-- Title and Actions -->
+<div class="flex items-center mb-6">
+    <div class="flex-1">
+        <button hx-get="/home" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+            type="submit" class="bg-gray-500 hover:bg-gray-400 py-2 px-4 mx-2 border-b-4 border-gray-700 hover:border-gray-500 rounded text-sm text-white font-bold ">
+            Inicio </button>
+    </div>
+    <div class="flex-none pb-2">
+        <h1 class="text-2xl text-gray-700 font-bold text-center">Crear nueva cuenta de usuario</h1>
+        <p class="font-normal text-m text-gray-400 md:px-2 py-2 text-center">Ingrese la información requerida</p>
+    </div>
+    <div class="flex-1">
+    </div>
+</div>
+<form hx-post="/admin/createAccount" hx-target="#content-div" hx-trigger="submit" hx-swap="innerHTML">
+<!-- Module, Role and Owner ID -->
+<div class="flex flex-wrap -mx-3 mb-3">
+    <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+        <label for="module"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+            Plataforma (Módulo) </label>
+        <select id="module" name="module"
+            class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200">
+            <option disabled selected value> — Buscar... — </option>
+            {{range $key, $value := .modules}}
+            <option value="{{$key}}" 
+                class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                {{$value}}</option>
+            {{end}}
+        </select>
+    </div>
+    <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+        <label for="acc_role"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+            Rol (Permisos) </label>
+        <select id="acc_role" name="acc_role"
+            hx-get="/admin/getAccRoles" hx-trigger="change from:#module" hx-include="#module" hx-target="#acc_role" hx-swap="outerHTML"
+            class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200">
+            <option disabled selected value> — "Plataforma" requerida — </option>
+        </select>
+    </div>
+    <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+        <label for="owner_uuid"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+            Propietario </label>
+        <select id="owner_uuid" name="owner_uuid"
+            hx-get="/admin/getOwners" hx-trigger="change from:#module,change from:#acc_role" hx-include="#module,#acc_role" hx-target="#owner_uuid" hx-swap="outerHTML"
+            class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200">
+            <option disabled selected value> — "Plataforma" y "Rol" requeridos — </option>
+        </select>
+    </div>    
+</div>
+<!-- Mail and Password -->
+<div class="flex flex-wrap -mx-3 mb-3">
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <label for="username"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> E-mail </label>
+        <input id="username" name="username" type="text" placeholder="Ej: usuario@mail.com"
+            class="w-full p-3 bg-white rounded text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+    </div>
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <label for="pw"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Contraseña </label>
+        <input id="pw" name="pw" type="text" placeholder="*********"
+            class="w-full p-3 bg-white rounded text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+    </div>
+</div>
+<div class="container flex justify-center mt-6">
+    <div class="flex flex-row mx-auto">
+        <button hx-get="/admin/createAccount" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+            class="bg-red-400 hover:bg-red-300 py-2 px-4 mx-2 border-b-4 border-red-600 hover:border-red-400 rounded text-white font-bold">
+            Descartar </button>
+        <button type="submit" 
+                class="bg-green-500 hover:bg-green-400 py-2 px-4 mx-2 border-b-4 border-green-600 hover:border-green-400 rounded text-white font-bold">
+            Crear Usuario </button>
+    </div>
+</div>
+</form>
+<script>
+    function typeInput() {
+        return {
+            open: false,
+            type_id: 1,
+            type_display: 'Parroquia',
+            toggle() { this.open = !this.open; },
+            setTypeID(key, value) {
+                this.type_id = key;
+                this.type_display = value;
+            }
+        }
+    }
+</script>
+

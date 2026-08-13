@@ -1,0 +1,66 @@
+services:
+  webserver:
+    image: caddy
+    container_name: zignurat-webserver
+    depends_on:
+      - identirat
+    ports:
+      - "80:80"
+    volumes:
+      - caddy-config:/config
+      - caddy-data:/data
+      - ./webserver/Caddyfile:/etc/caddy/Caddyfile:ro
+    networks:
+      - zignurat-network
+  identirat:
+    build:
+      context: .
+      dockerfile: identirat/Dockerfile
+    container_name: ${IDENTIRAT_APP}
+    environment:
+      IDENTIRAT_PORT: ${IDENTIRAT_PORT}
+      IDENTIRAT_DB_HOST: ${IDENTIRAT_DB}
+      IDENTIRAT_DB_PORT: ${IDENTIRAT_DB_PORT}
+      IDENTIRAT_DB_NAME: ${IDENTIRAT_DB_NAME}
+      IDENTIRAT_DB_USER: ${IDENTIRAT_DB_USER}
+      IDENTIRAT_DB_PW: ${IDENTIRAT_DB_PW}
+      JWT_SECRET: ${JWT_SECRET}
+      SESSION_SECRET: ${SESSION_SECRET}
+    env_file:
+      - ./.env
+    depends_on:
+      identirat-db:
+        condition: service_healthy
+    networks:
+      - zignurat-network
+  identirat-db:
+    image: postgres:17
+    restart: always
+    container_name: ${IDENTIRAT_DB}
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_DB: ${IDENTIRAT_DB_NAME}
+      POSTGRES_PORT: ${IDENTIRAT_DB_PORT}
+      POSTGRES_USER: ${IDENTIRAT_DB_USER}
+      POSTGRES_PASSWORD: ${IDENTIRAT_DB_PW}
+    healthcheck:
+      test: [CMD-SHELL, "sh -c 'pg_isready -U ${IDENTIRAT_DB_USER} -d ${IDENTIRAT_DB_NAME}'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5442:5432"
+    volumes:
+      - identirat-pg-data:/var/lib/postgresql/data
+      - ./docker/identirat-db/initdb.d:/docker-entrypoint-initdb.d:ro
+    networks:
+      - zignurat-network
+
+volumes:
+  identirat-pg-data:
+  caddy-config:
+  caddy-data:
+
+networks:
+  zignurat-network:
