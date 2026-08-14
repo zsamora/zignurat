@@ -1,0 +1,137 @@
+<div class="flex items-center mb-6">
+    <div class="flex-1">
+        <button hx-get="/index" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+            type="submit" class="bg-gray-500 hover:bg-gray-400 py-2 px-4 mx-2 border-b-4 border-gray-700 hover:border-gray-500 rounded text-sm text-white font-bold ">
+            Inicio </button>
+    </div>
+    <div class="flex-none">
+        <h1 class="text-2xl font-bold text-gray-700 text-center">Organizaciones</h1>
+    </div>
+    <div class="flex-1">
+        <button hx-get="/createOrg" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+                class="float-right bg-green-500 hover:bg-green-400 py-2 px-4 mx-2 border-b-4 border-green-600 hover:border-green-400 rounded text-sm text-white font-bold">
+            Nueva Organización </button>
+    </div>
+</div>
+<div class="relative flex flex-col w-full h-full overflow-scroll text-gray-700 bg-white shadow-md rounded-lg bg-clip-border mb-3">
+    <table class="w-full text-left table-auto min-w-max">
+        <thead>
+        <tr>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    ID
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Tipo de Org.
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Nombre
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Diócesis
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Comuna
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Dirección
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Párroco
+                </p>
+            </th>
+            <!--<th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Contacto
+                </p>
+            </th>-->
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Libros
+                </p>
+            </th>
+            <!--<th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Certificados
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Inscripciones
+                </p>
+            </th>-->
+        </tr>
+        </thead>
+        <tbody>
+        {{range .orgs}}
+            <tr class="hover:bg-slate-50">
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="font-bold text-xs text-slate-500">{{.ID}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500">{{.OrgType | parseOrgType}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500">{{.Name}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500">{{.Diocese}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500">{{.Commune}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500">{{.Address}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500">
+                    {{.AdminID}}
+                    </p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <form hx-post="/getOrgBooks" hx-target="#content-div" hx-swap="innerHTML">
+                        <input type="hidden" id="org_id" name="org_id" value="{{.ID}}">
+                        <input type="hidden" id="org_type" name="org_type" value="{{.OrgType}}">
+                        <input type="hidden" id="org_name" name="org_name" value="{{.Name}}">
+                        <button type="submit"
+                                class="text-white font-bold bg-teal-500 hover:bg-teal-400 py-2 px-4 mx-2 border-b-4 border-teal-700 hover:border-teal-500 rounded">
+                            Ver </button>
+                    </form>
+                </td>
+                <!--<td class="p-4 border-b border-slate-200 py-5">
+                    <form hx-post="/getOrgCertificates" hx-target="#content-div" hx-swap="innerHTML">
+                        <input type="hidden" id="org_id" name="org_id" value="{{.ID}}">
+                        <input type="hidden" id="org_type" name="org_type" value="{{.OrgType}}">
+                        <input type="hidden" id="org_name" name="org_name" value="{{.Name}}">
+                        <button type="submit"
+                                class="text-white font-bold bg-emerald-500 hover:bg-emerald-400 py-2 px-4 mx-2 border-b-4 border-emerald-700 hover:border-emerald-500 rounded">
+                            Ver </button>
+                    </form>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <form hx-post="/getOrgInscriptions" hx-target="#content-div" hx-swap="innerHTML">
+                        <input type="hidden" id="org_id" name="org_id" value="{{.ID}}">
+                        <input type="hidden" id="org_type" name="org_type" value="{{.OrgType}}">
+                        <input type="hidden" id="org_name" name="org_name" value="{{.Name}}">
+                        <button type="submit"
+                                class="text-white font-bold bg-cyan-500 hover:bg-cyan-400 py-2 px-4 mx-2 border-b-4 border-cyan-700 hover:border-cyan-500 rounded">
+                            Ver </button>
+                    </form>
+                </td>-->
+            </tr>
+        {{end}}
+        </tbody>
+    </table>
+</div>

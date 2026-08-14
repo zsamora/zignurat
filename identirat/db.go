@@ -1,9 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 
+	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -72,4 +76,56 @@ func updateAccount(db *gorm.DB, acc Account) {
 		log.Printf("# Identirat: Error updating account: %s", result.Error)
 	}
 	log.Printf("# Identirat: N° rows updated: %d", result.RowsAffected)
+}
+
+type ownerOption struct {
+	UUID        uuid.UUID `json:"uuid"`
+	DisplayName string    `json:"display_name"`
+}
+
+func fetchNotariatOwners(path string) []ownerOption {
+	notariatUrl := utils.GetConfig("NOTARIAT_URL")
+	notariatPort := utils.GetConfig("NOTARIAT_PORT")
+	requestURL := fmt.Sprintf("http://%s:%s/internal/%s", notariatUrl, notariatPort, path)
+	res, err := http.Get(requestURL)
+	if err != nil {
+		log.Printf("# Identirat: Failed fetching Notariat %s: %s", path, err)
+		return nil
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		log.Printf("# Identirat: Error status code fetching Notariat %s: %d", path, res.StatusCode)
+		return nil
+	}
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Printf("# Identirat: Failed reading Notariat %s response: %s", path, err)
+		return nil
+	}
+	var owners []ownerOption
+	if err := json.Unmarshal(body, &owners); err != nil {
+		log.Printf("# Identirat: Failed parsing Notariat %s response: %s", path, err)
+		return nil
+	}
+	return owners
+}
+
+func ownersForAccount(module uint8, accRole uint8) []ownerOption {
+	switch module {
+	case 2:
+		return ownersForNotariatRole(accRole)
+	default:
+		return nil
+	}
+}
+
+func ownersForNotariatRole(accRole uint8) []ownerOption {
+	switch accRole {
+	case 2:
+		return fetchNotariatOwners("organizations")
+	case 3:
+		return fetchNotariatOwners("users")
+	default:
+		return nil
+	}
 }

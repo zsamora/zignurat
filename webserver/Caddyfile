@@ -1,3 +1,6 @@
 http://identirat.localhost {
     reverse_proxy identirat-app:9000
 }
+http://notariat.localhost {
+    reverse_proxy notariat-app:9002
+}

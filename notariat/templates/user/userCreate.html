@@ -1,0 +1,154 @@
+<h1 class="text-2xl text-gray-700 font-bold text-center">Crear nuevo cliente</h1>
+<p class="font-normal text-m text-gray-400 md:px-2 py-2 text-center">Ingrese la información requerida</p>
+<form hx-post="/createUser" hx-target="#content-div" hx-swap="innerHTML" class="mt-8 space-y-4">
+    <!-- Name/s and Surname/s -->
+    <div class="flex flex-wrap -mx-3 mb-3">
+        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+            <label for="names"
+                   class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Nombre/s </label>
+            <input id="names" name="names" type="text" placeholder="Ej: Pedro Ignacio"
+                   class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+        </div>
+        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+            <label for="surnames"
+                   class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Apellido/s </label>
+            <input id="surnames" name="surnames" type="text" placeholder="Ej: Gutiérrez Rojas"
+                   class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+        </div>
+    </div>
+    <!-- Date of Birth -->
+    <div class="flex flex-wrap -mx-3 mb-3">
+        <div class="w-full px-3 mb-6 md:mb-0">
+            <div x-data="calendarInput" class="antialiased sans-serif">
+                <label for="date_birth"
+                       class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Fecha de nacimiento</label>
+                <div class="relative">
+                    <input type="hidden" id="date_birth" name="date_birth" x-model="date_birth">
+                    <input type="text" readonly x-model="dateBirthDisplay" @click="open = !open" placeholder="Seleccione una fecha del calendario"
+                           class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg py-3 px-4 border border-gray-200 leading-none focus:outline-none focus:bg-white focus:border-gray-500 rounded">
+                    <div x-show="open" x-transition @click.away="closeCalendar"
+                         class="bg-white p-4 absolute rounded-lg shadow z-2">
+                        <div class="flex justify-between items-center mb-2">
+                            <button type="button" @click="prevMonth"
+                                    class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                                <svg class="h-6 w-6 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+                            <div>
+                                <span x-text="MONTHS[month]" class="text-lg font-bold text-gray-800"></span>
+                                <span x-text="year" class="ml-1 text-lg text-gray-600 font-normal"></span>
+                            </div>
+                            <button type="button" @click="nextMonth"
+                                    class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                                <svg class="h-6 w-6 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                            </button>
+                        </div>
+                        <div class="flex flex-wrap mb-3 -mx-1">
+                            <template x-for="(day, index) in DAYS" :key="index">
+                                <div style="width: 14.26%" class="px-1">
+                                    <div x-text="day" class="text-gray-800 font-medium text-center text-xs"></div>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="flex flex-wrap -mx-1">
+                            <template x-for="blankday in blankdays">
+                                <div style="width: 14.28%" class="text-center border p-1 border-transparent text-sm"></div>
+                            </template>
+                            <template x-for="(date, dateIndex) in no_of_days" :key="dateIndex">
+                                <div style="width: 14.28%" class="px-1 mb-1">
+                                    <div @click="setDate(date)" x-text="date"
+                                         class="cursor-pointer text-center text-sm leading-none rounded-full leading-loose transition ease-in-out duration-100"
+                                         :class="{'bg-blue-500 text-white': isToday(date) == true, 'text-gray-700 hover:bg-blue-200': isToday(date) == false }"></div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Buttons -->
+    <div class="container flex justify-center mx-auto">
+        <div class="flex flex-row mx-auto">
+            <button type="submit"
+                    class="text-white font-bold bg-blue-500 hover:bg-blue-400 py-2 px-4 mx-2 border-b-4 border-blue-700 hover:border-blue-500 rounded">
+                Enviar </button>
+        </div>
+    </div>
+</form>
+<script>
+    function calendarInput() {
+        return {
+            open: false,
+            no_of_days: [],
+            blankdays: [],
+            init() {
+                let today = new Date();
+                this.date = today.getDate();
+                this.dateSel = this.date;
+                this.month = today.getMonth();
+                this.monthSel = this.month;
+                this.year = today.getFullYear();
+                this.yearSel = this.year;
+                this.date_birth = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateBirthDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+                this.getDays();
+            },
+            getDays() {
+                let dayOfWeek = new Date(this.year, this.month).getDay();
+                let blankdaysArray = [];
+                for (var i = 1; i <= dayOfWeek; i++) {
+                    blankdaysArray.push(i);
+                }
+                this.blankdays = blankdaysArray;
+                let daysInMonth = new Date(this.year, this.month + 1, 0).getDate();
+                let daysArray = [];
+                for (var i = 1; i <= daysInMonth; i++) {
+                    daysArray.push(i);
+                }
+                this.no_of_days = daysArray;
+            },
+            prevMonth() {
+                if (this.month === 0) {
+                    this.month = 11;
+                    this.year--;
+                }
+                else
+                    this.month--;
+                this.getDays();
+            },
+            nextMonth() {
+                if (this.month === 11) {
+                    this.month = 0;
+                    this.year++;
+                }
+                else
+                    this.month++;
+                this.getDays();
+            },
+            isToday(date) {
+                const currentDate = new Date(this.year, this.month, date);
+                const selectedDate = new Date(this.yearSel, this.monthSel, this.dateSel);
+                return selectedDate.toDateString() === currentDate.toDateString();
+            },
+            setDate(date) {
+                this.dateSel = date;
+                this.monthSel = this.month;
+                this.yearSel = this.year;
+                this.date_birth = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateBirthDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+                this.open = false;
+            },
+            closeCalendar() {
+                this.open = false;
+                this.date = this.dateSel;
+                this.month = this.monthSel;
+                this.year = this.yearSel;
+            }
+        }
+    }
+</script>
+

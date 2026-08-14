@@ -17,9 +17,15 @@ var (
 	}
 	modules = map[uint8]string{
 		1: "Identirat",
+		2: "Notariat",
 	}
 	identiratRoles = map[uint8]string{
 		1: "Administrador",
+	}
+	notariatRoles = map[uint8]string{
+		1: "Administrador",
+		2: "Organización",
+		3: "Usuario",
 	}
 )
 
@@ -148,6 +154,11 @@ func LoginJSON(db *gorm.DB) gin.HandlerFunc {
 						name = name + " (" + identiratRoles[accountRole] + ")"
 						jwt_token, refresh_token := utils.GenerateJWTTokens(accountID, name, module, accountRole, ownerUUID)
 						c.JSON(http.StatusOK, gin.H{"token": jwt_token, "refresh": refresh_token})
+					case 2:
+						log.Printf("## Notariat Account")
+						name = name + " (" + notariatRoles[accountRole] + ")"
+						jwt_token, refresh_token := utils.GenerateJWTTokens(accountID, name, module, accountRole, ownerUUID)
+						c.JSON(http.StatusOK, gin.H{"token": jwt_token, "refresh": refresh_token})
 					default:
 						log.Printf("!! Account doesn't belong to modules available")
 						c.JSON(http.StatusUnauthorized, gin.H{"error": "Account invalid"})
@@ -198,6 +209,10 @@ func CreateAccountGetAccountRoles() gin.HandlerFunc {
 			c.HTML(http.StatusOK, "accountRoles.html", gin.H{
 				"accountRoles": identiratRoles,
 			})
+		case 2:
+			c.HTML(http.StatusOK, "accountRoles.html", gin.H{
+				"accountRoles": notariatRoles,
+			})
 		default:
 			log.Println("!! No module defined for this value")
 			c.HTML(http.StatusOK, "accountRoles.html", gin.H{
@@ -211,10 +226,11 @@ func CreateAccountGetOwners() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		module, _ := utils.ParseInt(c.Query("module"))
 		accountRole, _ := utils.ParseInt(c.Query("acc_role"))
+		owners := ownersForAccount(uint8(module), uint8(accountRole))
 		c.HTML(http.StatusOK, "accountOwners.html", gin.H{
 			"Module":  module,
 			"AccRole": accountRole,
-			"owners":  nil,
+			"owners":  owners,
 		})
 	}
 }
@@ -267,12 +283,13 @@ func UpdateAccountSetOwner(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		accIdInt, _ := utils.ParseInt(c.PostForm("acc_id"))
 		account := getAccountById(db, int64(accIdInt))
+		owners := ownersForAccount(account.Module, account.AccRole)
 
 		ownerUUID := c.PostForm("owner_uuid")
 		c.HTML(http.StatusOK, "setOwner.html", gin.H{
 			"AccountID": account.ID,
 			"Username":  account.Username,
-			"owners":    nil,
+			"owners":    owners,
 			"OwnerUUID": ownerUUID,
 		})
 	}

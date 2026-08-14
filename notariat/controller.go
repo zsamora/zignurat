@@ -12,15 +12,15 @@ import (
 	"github.com/zsamora/utils"
 )
 
-func IdentiratController() http.Handler {
-	log.Println("### Identirat v0.1 ###")
+func NotariatController() http.Handler {
+	log.Println("### Notariat v0.1 ###")
 	router := gin.Default()
 	// Create DB connection (Handles connection pooling and is threadsafe)
 	db := connectGORM()
 	router.SetFuncMap(template.FuncMap{
-		"parseDate": utils.FormatDate,
+		"parseDate":    utils.FormatDate,
+		"parseOrgType": ParseOrgType,
 	})
-	router.Static("/img", "./img")
 	router.LoadHTMLGlob("templates/**/*")
 	store := cookie.NewStore([]byte(utils.GetConfig("SESSION_SECRET")))
 	store.Options(sessions.Options{
@@ -30,7 +30,8 @@ func IdentiratController() http.Handler {
 	})
 	router.Use(sessions.Sessions("session", store))
 	LandingRoutes(router)
-	LoginRoutes(router, db)
-	AuthRoutes(router, db)
+	LoginRoutes(router)
+	AdminRoutes(router, db)
+	InternalRoutes(router, db)
 	return router
 }

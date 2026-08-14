@@ -4,6 +4,7 @@ services:
     container_name: zignurat-webserver
     depends_on:
       - identirat
+      - notariat
     ports:
       - "80:80"
     volumes:
@@ -24,6 +25,8 @@ services:
       IDENTIRAT_DB_NAME: ${IDENTIRAT_DB_NAME}
       IDENTIRAT_DB_USER: ${IDENTIRAT_DB_USER}
       IDENTIRAT_DB_PW: ${IDENTIRAT_DB_PW}
+      NOTARIAT_URL: ${NOTARIAT_URL}
+      NOTARIAT_PORT: ${NOTARIAT_PORT}
       JWT_SECRET: ${JWT_SECRET}
       SESSION_SECRET: ${SESSION_SECRET}
     env_file:
@@ -56,9 +59,59 @@ services:
       - ./docker/identirat-db/initdb.d:/docker-entrypoint-initdb.d:ro
     networks:
       - zignurat-network
+  notariat:
+    build:
+      context: .
+      dockerfile: notariat/Dockerfile
+    container_name: ${NOTARIAT_APP}
+    environment:
+      NOTARIAT_PORT: ${NOTARIAT_PORT}
+      NOTARIAT_DB_HOST: ${NOTARIAT_DB}
+      NOTARIAT_DB_PORT: ${NOTARIAT_DB_PORT}
+      NOTARIAT_DB_NAME: ${NOTARIAT_DB_NAME}
+      NOTARIAT_DB_USER: ${NOTARIAT_DB_USER}
+      NOTARIAT_DB_PW: ${NOTARIAT_DB_PW}
+      IDENTIRAT_URL: ${IDENTIRAT_URL}
+      IDENTIRAT_PORT: ${IDENTIRAT_PORT}
+      IDENTIRAT_LOGIN: ${IDENTIRAT_LOGIN}
+      JWT_SECRET: ${JWT_SECRET}
+      SESSION_SECRET: ${SESSION_SECRET}
+    env_file:
+      - ./.env
+    depends_on:
+      notariat-db:
+        condition: service_healthy
+      identirat:
+        condition: service_started
+    networks:
+      - zignurat-network
+  notariat-db:
+    image: postgres:17
+    restart: always
+    container_name: ${NOTARIAT_DB}
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_DB: ${NOTARIAT_DB_NAME}
+      POSTGRES_PORT: ${NOTARIAT_DB_PORT}
+      POSTGRES_USER: ${NOTARIAT_DB_USER}
+      POSTGRES_PASSWORD: ${NOTARIAT_DB_PW}
+    healthcheck:
+      test: [CMD-SHELL, "sh -c 'pg_isready -U ${NOTARIAT_DB_USER} -d ${NOTARIAT_DB_NAME}'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5443:5432"
+    volumes:
+      - notariat-pg-data:/var/lib/postgresql/data
+      - ./docker/notariat-db/initdb.d:/docker-entrypoint-initdb.d:ro
+    networks:
+      - zignurat-network
 
 volumes:
   identirat-pg-data:
+  notariat-pg-data:
   caddy-config:
   caddy-data:
 

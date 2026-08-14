@@ -13,3 +13,10 @@
 .mcp.json
 .DS_Store
 Thumbs.db
+
+# Notariat local resources (fonts, images) and build artifacts
+/notariat/notariat
+/notariat/notariat-app
+/notariat/ttf/
+/notariat/img/
+/notariat/pdf/*.pdf
