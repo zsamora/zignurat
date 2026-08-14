@@ -18,9 +18,13 @@ func NotariatController() http.Handler {
 	// Create DB connection (Handles connection pooling and is threadsafe)
 	db := connectGORM()
 	router.SetFuncMap(template.FuncMap{
-		"parseDate":    utils.FormatDate,
-		"parseOrgType": ParseOrgType,
+		"parseDate":     utils.FormatDate,
+		"parseYear":     utils.FormatYear,
+		"parseOrgType":  ParseOrgType,
+		"parseBookType": ParseBookType,
 	})
+	router.Static("/img", "./img")
+	router.Static("/pdf", "./pdf")
 	router.LoadHTMLGlob("templates/**/*")
 	store := cookie.NewStore([]byte(utils.GetConfig("SESSION_SECRET")))
 	store.Options(sessions.Options{
@@ -32,6 +36,10 @@ func NotariatController() http.Handler {
 	LandingRoutes(router)
 	LoginRoutes(router)
 	AdminRoutes(router, db)
+	OrgRoutes(router, db)
+	BookRoutes(router, db)
+	RegisterRoutes(router, db)
+	CertificateRoutes(router, db)
 	InternalRoutes(router, db)
 	return router
 }

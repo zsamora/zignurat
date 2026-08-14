@@ -1,0 +1,98 @@
+<div class="flex items-center mb-6">
+    <div class="flex-1">
+        <button hx-get="/admin/organizations" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+            type="submit" class="bg-gray-500 hover:bg-gray-400 py-2 px-4 mx-2 border-b-4 border-gray-700 hover:border-gray-500 rounded text-sm text-white font-bold ">
+            Volver </button>
+    </div>
+    <div class="flex-none">
+        <h1 class="text-2xl font-bold text-gray-700 text-center pb-2"> Libros </h1>
+    </div>
+    <div class="flex-1">
+        <form hx-post="/createBook" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML">
+            <input type="hidden" id="org_id" name="org_id" value='{{.OrgID}}' readonly="readonly">
+            <button type="submit"
+                    class="float-right bg-green-500 hover:bg-green-400 py-2 px-4 mx-2 border-b-4 border-green-600 hover:border-green-400 rounded text-sm text-white font-bold">
+                    Nuevo Libro </button>
+        </form>
+    </div>
+</div>
+<div id="table-content" class="flex flex-col h-full my-6 items-center">
+    <table class="w-full max-w-5xl text-left table-auto text-gray-700 bg-white shadow-md rounded-lg bg-clip-border">
+        <thead>
+        <tr>
+            <!--<th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Org. ID
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Tipo
+                </p>
+            </th>-->
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    N°
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Fecha de Apertura
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Fecha de Cierre
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Registros / Certificados
+                </p>
+            </th>
+            <!--<th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Índice
+                </p>
+            </th>-->
+        </tr>
+        </thead>
+        <tbody>
+        {{range .books}}
+            <tr class="hover:bg-slate-50">
+                <!--<td class="p-4 border-b border-slate-200 py-5">
+                    <p class="font-bold italic text-xs text-slate-500"><i>{.OrgID}</i></p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500">{.BookType | parseBookType}</p>
+                </td>-->
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="font-bold text-sm text-slate-500">{{.BookNr}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500">{{.DateInitial | parseDate}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500">{{.DateFinal | parseDate}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <form hx-post="/getBookRegisters" hx-target="#content-div" hx-swap="innerHTML">
+                        <input type="hidden" id="book_id" name="book_id" value="{{.ID}}">
+                        <button type="submit"
+                                class="bg-blue-400 hover:bg-blue-300 py-2 px-4 mx-2 border-b-4 border-blue-600 hover:border-blue-400 rounded text-sm text-white font-bold ">
+                            Ver </button>
+                    </form>
+                </td>
+                <!--<td class="p-4 border-b border-slate-200 py-5">
+                    <form hx-post="/getBookIndex" hx-target="#content-div" hx-swap="innerHTML">
+                        <input type="hidden" id="book_id" name="book_id" value="{{.ID}}">
+                        <button type="submit" disabled
+                        class="bg-gray-200 hover:bg-gray-100 py-2 px-4 mx-2 border-b-4 border-gray-300 hover:border-gray-200 rounded text-sm text-white font-bold disabled:pointer-events-none cursor-not-allowed">
+                        Ver </button>
+                    </form>
+                </td>-->
+            </tr>
+        {{end}}
+        </tbody>
+    </table>
+</div>

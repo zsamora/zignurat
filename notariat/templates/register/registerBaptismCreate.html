@@ -1,0 +1,461 @@
+<!-- Title and Actions -->
+<div class="flex items-center mb-6 md:mb-0">
+    <div class="flex-none">
+        <!--<button hx-get="/home" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+            type="submit" class="bg-gray-500 hover:bg-gray-400 py-2 px-4 mx-2 border-b-4 border-gray-700 hover:border-gray-500 rounded text-sm text-white font-bold ">
+            Inicio </button>-->
+    </div>
+    <div class="flex-auto">
+        <h1 class="text-2xl font-bold text-gray-800 text-center"> Registro de Bautismo</h1>
+        <h1 class="text-base font-bold text-gray-600 text-center"> Ingrese la información faltante
+        </h1>
+    </div>
+    <div class="flex-none">
+    </div>
+</div>
+<form hx-post="/addRegisterBaptism" hx-target="#content-div" hx-trigger="submit" hx-swap="innerHTML">
+<div class="border-2 border-gray-200 p-8 my-6">
+<!-- Book Info -->
+<div class="flex flex-wrap -mx-3 mb-3">
+    <!-- Book -->
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <label for="book_id"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Libro </label>
+        {{if .Book}}
+        {{$yearInitial := .Book.DateInitial | parseYear}}
+        {{$yearFinal := .Book.DateFinal | parseYear}}
+            <input hidden id="book_id" name="book_id" value={{.Book.ID}} readonly>
+            <p class="w-full p-3 bg-gray-200 rounded focus:outline-none text-gray-700 text-lg"> Libro N° {{.Book.BookNr}} <i class="text-sm">({{$yearInitial}}{{if ne $yearInitial $yearFinal}} - {{$yearFinal}}{{end}})</i></p>
+        {{else}}
+            <select id="book_id" name="book_id"
+                    class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                <option disabled selected value> -- Seleccione un libro -- </option>
+            {{range .books}}
+                <option value="{{.ID}}" 
+                        class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                    Libro de {{.BookType | parseBookType}} N° {{.BookNr}} (ID: {{.ID}}) - Organización (ID: {{.OrgID}})</option>
+            {{end}}
+            </select>
+        {{end}}
+    </div>
+    <!-- Page -->
+    <div class="w-full md:w-1/6 px-3 mb-6 md:mb-0">
+        <label for="page_nr"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Página </label>
+        <input id="page_nr" name="page_nr" 
+                {{if .PageNumber}} readonly value={{.PageNumber}} class="w-full p-3 bg-gray-200 rounded focus:outline-none text-gray-700 text-lg"
+                {{else}} placeholder="Ej: 235" class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200" {{end}}>
+    </div>
+    <!-- Register Number -->
+    <div class="w-full md:w-1/6 px-3 mb-6 md:mb-0">
+        <label for="reg_nr"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Registro N°</label>
+        <input id="reg_nr" name="reg_nr"
+                {{if .RegNumber}} readonly value={{.RegNumber}} class="w-full p-3 bg-gray-200 rounded focus:outline-none text-gray-700 text-lg"
+                {{else}} placeholder="Ej: 30" class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200" {{end}}>
+    </div>
+     <!-- Index Number-->
+    <div class="w-full md:w-1/6 px-3 mb-6 md:mb-0">
+        <label for="index_id"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Índice N° </label>
+        <input id="index_id" name="index_id"
+                {{if .IndexID}} readonly value={{.IndexID}} class="w-full p-3 bg-gray-200 rounded focus:outline-none text-gray-700 text-lg"
+                {{else}} placeholder="Ej: 100" class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200" {{end}}>
+    </div>
+</div>
+<!-- Baptism Info -->
+<div class="flex flex-wrap -mx-3 mb-3">
+    <!-- Organization Baptism -->
+    <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+        <label for="org_baptism"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Bautizado en </label>
+        {{if .Org}}
+            <input hidden id="org_baptism" name="org_baptism" value={{.Org.ID}}>
+            <p class="w-full p-3 bg-gray-200 rounded focus:outline-none text-gray-700 text-lg"> {{.Org.OrgType | parseOrgType}} - {{.Org.Name}}</p>
+        {{else}}
+            <select id="org_baptism" name="org_baptism"
+                    class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                <option disabled selected value> -- Seleccione la organización -- </option>
+                {{range .orgs}}
+                <option value="{{.ID}}" 
+                    class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                    {{.OrgType | parseOrgType}} - {{.Name}}</option>
+                {{end}}
+            </select>
+        {{end}}
+    </div>
+    <!-- Baptizer -->
+    <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+        <label for="baptizer"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Bautizado por </label>
+        <input id="baptizer" name="baptizer" type="text" placeholder="Ej: Párroco"
+            class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200">
+    </div>
+    <!-- Date and Year of Baptism -->
+    <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+        <div x-data="dateAndYearInput(0)" class="antialiased sans-serif">
+            <label for="date_baptism"
+                    class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Bautizado el día </label>
+            <div class="relative">
+                <!-- Display -->
+                <input type="hidden" id="date_baptism" name="date_baptism" x-model="date_baptism">
+                <input type="text" readonly x-model="dateBaptismDisplay" @click="closeChange" placeholder="Buscar..." 
+                    class="w-full p-3 bg-white rounded border border-gray-200  text-gray-700 text-lg focus:outline-none focus:border-gray-400 transition ease-in-out duration-200">
+                <div class="absolute top-0 right-0 px-4 py-3">
+                    <svg class="h-6 w-6 text-gray-400"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <!-- Date -->
+                <div x-show="open" x-transition @click.away="closeCalendar"
+                    class="w-full bg-white p-4 absolute right-0 rounded-lg shadow z-10">
+                    <!-- Buttons and Display -->
+                    <div class="flex justify-between items-center mb-3">
+                        <!-- Months -->
+                        <button type="button" @click="prevMonth"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                            <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                        </button>
+                        <span x-text="MONTHS[month]" class="md:w-1/3 text-lg font-bold text-gray-700 text-center"></span>
+                        <button type="button" @click="nextMonth"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                            <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                        <!-- Year -->
+                        <button type="button" @click="prevYear"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                            <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                        </button>
+                        <input x-model="year" class="md:w-1/3 text-lg text-gray-700 font-bold text-center"/>
+                        <button type="button" @click="nextYear"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                            <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <!-- Calendar -->
+                    <div class="flex flex-wrap mb-3 -mx-1">
+                        <template x-for="(day, index) in DAYS" :key="index">
+                            <div style="width: 14.26%" class="px-1">
+                                <div x-text="day" class="text-gray-800 font-medium text-center text-xs"></div>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="flex flex-wrap -mx-1">
+                        <template x-for="blankday in blankdays">
+                            <div style="width: 14.28%" class="text-center border p-1 border-transparent text-sm"></div>
+                        </template>
+                        <template x-for="(date, dateIndex) in no_of_days" :key="dateIndex">
+                            <div style="width: 14.28%" class="px-1 mb-1">
+                                <div @click="setDate(date)" x-text="date"
+                                        class="cursor-pointer text-center text-sm leading-none rounded-full leading-loose transition ease-in-out duration-100"
+                                        :class="{'bg-blue-500 text-white': isToday(date) == true, 'text-gray-700 hover:bg-blue-200': isToday(date) == false }"></div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Baptized Names -->
+<div class="flex flex-wrap -mx-3 mb-3">
+    <!-- Baptized First Name -->
+    <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+        <label for="baptized_nf"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Primer Nombre Bautizado/a </label>
+        <input id="baptized_nf" name="baptized_nf" type="text" {{if .UserNameFirst}} value='{{.UserNameFirst}}' {{end}} placeholder="Ej: José"
+                class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200">
+    </div>
+    <!-- Baptized Second Name -->
+    <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+        <label for="baptized_ns"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Segundo Nombre Bautizado/a </label>
+        <input id="baptized_ns" name="baptized_ns" type="text" {{if .UserNameSecond}} value='{{.UserNameSecond}}' {{end}} placeholder="Ej: María"
+                class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200">
+    </div>
+    <!-- Baptized RUT -->
+    <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+        <label for="rut"
+             class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> RUT </label>
+        <input id="rut" name="rut" type="text" placeholder="Ej: 23.202.395-5"
+              class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200">
+    </div>
+</div>
+<!-- Baptized Info -->
+<div class="flex flex-wrap -mx-3 mb-3">
+    <!-- Birth Date -->
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <div x-data="dateAndYearInput(1)" class="antialiased sans-serif">
+            <label for="date_birth"
+                    class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Fecha de nacimiento </label>
+            <div class="relative">
+                <!-- Display -->
+                <input type="hidden" id="date_birth" name="date_birth" x-model="date_birth">
+                <input type="text" readonly x-model="dateBirthDisplay" @click="closeChange" placeholder="Buscar..." 
+                    class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200">
+                <div class="absolute top-0 right-0 px-4 py-3">
+                    <svg class="h-6 w-6 text-gray-400"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <!-- Date -->
+                <div x-show="open" x-transition @click.away="closeCalendar"
+                    class="w-full bg-white p-4 absolute right-0 rounded-lg shadow z-10">
+                    <!-- Buttons and Display -->
+                    <div class="flex justify-between items-center mb-3">
+                        <!-- Months -->
+                        <button type="button" @click="prevMonth"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                            <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                        </button>
+                        <span x-text="MONTHS[month]" class="md:w-1/3 text-lg font-bold text-gray-700 text-center"></span>
+                        <button type="button" @click="nextMonth"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                            <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                        <!-- Year -->
+                        <button type="button" @click="prevYear"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                            <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                        </button>
+                        <input x-model="year" class="md:w-1/3 text-lg text-gray-700 font-bold text-center"/>
+                        <button type="button" @click="nextYear"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                            <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <!-- Calendar -->
+                    <div class="flex flex-wrap mb-3 -mx-1">
+                        <template x-for="(day, index) in DAYS" :key="index">
+                            <div style="width: 14.26%" class="px-1">
+                                <div x-text="day" class="text-gray-800 font-medium text-center text-xs"></div>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="flex flex-wrap -mx-1">
+                        <template x-for="blankday in blankdays">
+                            <div style="width: 14.28%" class="text-center border p-1 border-transparent text-sm"></div>
+                        </template>
+                        <template x-for="(date, dateIndex) in no_of_days" :key="dateIndex">
+                            <div style="width: 14.28%" class="px-1 mb-1">
+                                <div @click="setDate(date)" x-text="date"
+                                        class="cursor-pointer text-center text-sm leading-none rounded-full leading-loose transition ease-in-out duration-100"
+                                        :class="{'bg-blue-500 text-white': isToday(date) == true, 'text-gray-700 hover:bg-blue-200': isToday(date) == false }"></div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Birth Place -->
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <label for="place_birth"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Lugar de nacimiento </label>
+        <input id="place_birth" name="place_birth" type="text" placeholder="Ej: Santiago, Chile"
+              class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200">
+    </div>
+</div>
+<!-- Parents -->
+<div class="flex flex-wrap -mx-3 mb-3">
+    <!-- Father Name -->
+    <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+        <label for="father_name"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Nombre Padre </label>
+        <input id="father_name" name="father_name" type="text" placeholder="Ej: Pedro Ignacio"
+                class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200">
+    </div>
+    <!-- Father Surname -->
+    <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+        <label for="father_surname"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Apellido Padre </label>
+        <input id="father_surname" name="father_surname" type="text" 
+                {{if .UserSurnameF}} value='{{.UserSurnameF}}' readonly class="w-full p-3 bg-gray-200 rounded focus:outline-none text-gray-700 text-lg"
+                {{else}} placeholder="Ej: Velázques Rojas" 
+                class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200" {{end}}>
+    </div>
+    <!-- Mother Name -->
+    <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+        <label for="mother_name"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Nombre Madre </label>
+        <input id="mother_name" name="mother_name" type="text" placeholder="Ej: Juana Myriam"
+                class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200">
+    </div>
+    <!-- Mother Surname -->
+    <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+        <label for="mother_surname"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Apellido Madre </label>
+        <input id="mother_surname" name="mother_surname" type="text" 
+                {{if .UserSurnameM}} value='{{.UserSurnameM}}' readonly 
+                class="w-full p-3 bg-gray-200 rounded focus:outline-none text-gray-700 text-lg"
+                {{else}} placeholder="Ej: Pérez Mora"
+                class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200" {{end}}>
+    </div>
+</div>
+<!-- Godparents -->
+<div class="flex flex-wrap -mx-3 mb-3">
+    <!-- Godfather -->
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <label for="godfather"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Padrino </label>
+        <input id="godfather" name="godfather" type="text" placeholder="Ej: Mario Lorca"
+                class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200">
+    </div>
+    <!-- Godmother -->
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <label for="godmother"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Madrina </label>
+        <input id="godmother" name="godmother" type="text" placeholder="Ej: Mariana Julia"
+                class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200">
+    </div>
+</div>
+</div>
+<!-- Button -->
+<div class="container flex justify-center mt-6">
+    <div class="flex flex-row mx-auto">
+        <button hx-get="/getBookRegisters/?book_id={{.Book.ID}}" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+            class="bg-red-400 hover:bg-red-300 py-2 px-4 mx-2 border-b-4 border-red-600 hover:border-red-400 rounded text-white font-bold">
+            Descartar </button>
+        <button type="submit"
+            class="bg-green-500 hover:bg-green-400 py-2 px-4 mx-2 border-b-4 border-green-600 hover:border-green-400 rounded text-white font-bold">
+            Crear Registro </button>
+    </div>
+</div>
+</form>
+<script>
+function dateAndYearInput(n) {
+    return {
+        // Variables
+        open: false,
+        no_of_days: [],
+        blankdays: [],
+        // General
+        init() {
+            let today = new Date();
+            //this.year_baptism = today.getFullYear();
+            this.date = today.getDate();
+            this.dateSel = this.date;
+            this.month = today.getMonth();
+            this.monthSel = this.month;
+            //this.year = today.getFullYear();
+            if (n === 0) {
+                this.yearSel = `{{.Book.DateFinal | parseYear}}`
+                this.date_baptism = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateBaptismDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+            if (n === 1) {
+                this.yearSel = `{{.Book.DateInitial | parseYear}}`
+                this.date_birth = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateBirthDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+            this.year = this.yearSel;
+            this.getDays();
+        },
+        getDays() {
+            let dayOfWeek = new Date(this.year, this.month).getDay();
+            let blankdaysArray = [];
+            for (var i = 1; i <= dayOfWeek; i++) {
+                blankdaysArray.push(i);
+            }
+            this.blankdays = blankdaysArray;
+            let daysInMonth = new Date(this.year, this.month + 1, 0).getDate();
+            let daysArray = [];
+            for (var i = 1; i <= daysInMonth; i++) {
+                daysArray.push(i);
+            }
+            this.no_of_days = daysArray;
+        },
+        // Calendar
+        closeChange() {
+            this.open = !this.open;
+            if (this.open == true) {
+                this.openCalendar();
+            }
+        },
+        saveData() {
+            if (n == 0) {
+                //this.year_baptism = this.year;
+                this.date_baptism = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                /*this.dateBaptismDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.year_baptism;*/ // TODO: Check
+                this.dateBaptismDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+            if (n === 1) {
+                this.date_birth = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateBirthDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+        },
+        openCalendar() {
+            if (this.yearSel != "") {
+                this.month = this.monthSel;
+                this.year = this.yearSel;
+            }
+            this.getDays();
+        },
+        closeCalendar() {
+            this.open = false;
+        },
+        isToday(date) {
+            const currentDate = new Date(this.year, this.month, date);
+            const selectedDate = new Date(this.yearSel, this.monthSel, this.dateSel);
+            return selectedDate.toDateString() === currentDate.toDateString();
+        },
+        setDate(date) {
+            this.dateSel = date;
+            this.monthSel = this.month;
+            this.yearSel = this.year;
+            if (n === 0) {
+                this.date_baptism = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateBaptismDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+            if (n === 1) {
+                this.date_birth = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateBirthDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+            this.closeCalendar();
+        },
+        // Buttons
+        prevMonth() {
+            if (this.month === 0) {
+                this.month = 11;
+                this.year--;
+            }
+            else
+                this.month--;
+            this.getDays();
+        },
+        nextMonth() {
+            if (this.month === 11) {
+                this.month = 0;
+                this.year++;
+            }
+            else
+                this.month++;
+            this.getDays();
+        },
+        prevYear() {
+            this.year--;
+            this.getDays();
+        },
+        nextYear() {
+            this.year++;
+            this.getDays();
+        }
+    }
+}
+</script>

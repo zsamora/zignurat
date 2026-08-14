@@ -1,0 +1,113 @@
+<div class="flex items-center mb-6 md:mb-0">
+    <div class="flex-none">
+        <!--<button hx-get="/home" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+            type="submit" class="bg-gray-500 hover:bg-gray-400 py-2 px-4 mx-2 border-b-4 border-gray-700 hover:border-gray-500 rounded text-sm text-white font-bold ">
+            Volver </button>-->
+    </div>
+    <div class="flex-auto pb-2">
+        <h1 class="text-2xl font-bold text-gray-700 text-center "> Certificado de Bautismo </h1>
+    </div>
+    <div class="flex-none">
+        <!--<button type="submit" disabled
+            class="bg-gray-200 hover:bg-gray-100 py-2 px-4 mx-2 border-b-4 border-gray-300 hover:border-gray-200 rounded text-sm text-white font-bold disabled:pointer-events-none cursor-not-allowed">
+            Descartar </button>-->
+    </div>
+</div>
+<form hx-post="/addCertificateBaptism" hx-target="#content-div" hx-trigger="submit" hx-swap="innerHTML">
+<div class="border-2 border-gray-200 p-8 my-6">
+<div class="flex flex-wrap -mx-3 mb-3">
+    <!-- Organization Emission -->
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <label for="org_id"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Organización Emisora del Certificado</label>
+        <input type="hidden" id="org_id" name="org_id" value='{{.Org.ID}}' readonly="readonly">
+        <p class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            {{.Org.OrgType | parseOrgType}} - {{.Org.Name}}</p>
+    </div>
+    <!-- User Validator -->
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <label for="user_val"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Encargado de Validación del Certificado </label>
+        <input type="hidden" id="user_val" name="user_val" value='{{.AdminBap.ID}}' readonly="readonly">
+        <p class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            {{.AdminBap.Names}} {{.AdminBap.Surnames}} </p>
+    </div>
+</div>
+<div class="flex flex-wrap -mx-3 mb-3">
+    <!-- Date Emission -->
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <div class="antialiased sans-serif">
+        <div x-data="defaultDate(0)">
+            <label for="date_emission"
+                    class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Fecha de Emisión </label>
+            <div class="relative">
+                <input type="hidden" id="date_emission" name="date_emission" x-model="date_emission">
+                <input x-model="dateEmissionDisplay"
+                    class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg py-3 px-4 border border-gray-200 leading-none focus:outline-none rounded">
+            </div>
+        </div>
+        </div>
+    </div>
+    <!-- Date Expiring -->
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <div class="antialiased sans-serif">
+        <div x-data="defaultDate(1)">
+            <label for="date_expiration"
+                    class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Fecha de Expiración </label>
+            <div class="relative">
+                <input type="hidden" id="date_expiration" name="date_expiration" x-model="date_expiration">
+                <input x-model="dateExpirationDisplay"
+                    class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg py-3 px-4 border border-gray-200 leading-none focus:outline-none rounded">
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+<!-- Register -->
+<div class="flex flex-wrap px-3 -mx-3 mb-3">
+    <label for="reg_id"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Descripción del registro</label>
+    <input type="hidden" id="reg_id" name="reg_id" value='{{.RegBap.ID}}' readonly="readonly">
+    <p class="appearance-none block w-full bg-gray-200 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 text-gray-700 text-lg">
+        Bautismo de <b>{{.RegBap.BaptizedNameF}} {{.RegBap.BaptizedNameS}} {{.RegBap.FatherSurname}} {{.RegBap.MotherSurname}}</b> de RUT <b>{{.RegBap.RUT}}</b>.<br>
+            Realizado en la <b>{{.OrgBap.OrgType | parseOrgType}} {{.OrgBap.Name}}</b> por <b>{{.RegBap.Baptizer}}</b> el día <b>{{.RegBap.DateBaptism | parseDate}}</b>.<br>
+            Registro <b>N° {{.RegBap.RegNumber}}</b> en la página <b>{{.RegBap.PageNumber}}</b> del libro <b>N° {{.BookBap.BookNr}}</b> <span class="text-base text-gray-600 text-center">({{.BookBap.DateInitial | parseYear}} - {{.BookBap.DateFinal | parseYear}})</span>.</p>
+</div>
+</div>
+<!-- Buttons -->
+<div class="container flex justify-center mt-6">
+    <div class="flex flex-row mx-auto">
+        <button hx-get="/getRegisterBaptism/?reg_id={{.RegBap.ID}}" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+            class="bg-red-400 hover:bg-red-300 py-2 px-4 mx-2 border-b-4 border-red-600 hover:border-red-400 rounded text-white font-bold">
+            Descartar </button>
+        <button type="submit" 
+                class="bg-green-500 hover:bg-green-400 py-2 px-4 mx-2 border-b-4 border-green-600 hover:border-green-400 rounded text-white font-bold">
+            Crear Certificado </button>
+    </div>
+</div>
+</form>
+<script>
+function defaultDate(n) {
+    return {
+        init() {
+            let today = new Date();
+            this.date = today.getDate();
+            this.dateSel = this.date;
+            this.month = today.getMonth();
+            this.monthSel = this.month;
+            this.year = today.getFullYear();
+            this.yearSel = this.year;
+            if (n === 0) {
+                this.date_emission = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateEmissionDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+            if (n === 1) {
+                this.yearSel = this.year + 1;
+                this.date_expiration = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateExpirationDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+            this.getDays();
+        },
+    }
+}
+</script>

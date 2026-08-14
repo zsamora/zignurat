@@ -1,0 +1,341 @@
+<div class="flex items-center mb-6 md:mb-0">
+    <div class="flex-none">
+        <!--<button hx-get="/home" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+            type="submit" class="bg-gray-500 hover:bg-gray-400 py-2 px-4 mx-2 border-b-4 border-gray-700 hover:border-gray-500 rounded text-sm text-white font-bold ">
+            Inicio </button>-->
+    </div>
+    <div class="flex-auto">
+        <h1 class="text-2xl font-bold text-gray-700 text-center pb-2"> Creación de Nuevo Libro </h1>
+    </div>
+    <div class="flex-none">
+        <!--<form hx-post="/createIndex" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML">
+            <input type="hidden" id="reg_id" name="reg_id" value='{{.RegID}}' readonly="readonly">
+            <button type="submit" disabled
+                    class="bg-gray-200 hover:bg-gray-100 py-2 px-4 mx-2 border-b-4 border-gray-300 hover:border-gray-200 rounded text-sm text-white font-bold disabled:pointer-events-none cursor-not-allowed">
+                    Nuevo Índice </button>
+        </form>-->
+    </div>
+</div>
+<form hx-post="/addBook" hx-target="#content-div" hx-trigger="submit" hx-swap="innerHTML" class="mt-8 space-y-4">
+<div class="my-6">
+<!-- Organization and Book Number -->
+<div class="flex flex-wrap -mx-3 mb-3">
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <label for="org_id"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Organización Responsable </label>
+            {{if .Org}}
+                <input hidden id="org_id" name="org_id" value={{.Org.ID}}>
+                <p class="w-full p-3 bg-gray-200 rounded focus:outline-none text-gray-700 text-lg"> {{.Org.OrgType | parseOrgType}} - {{.Org.Name}}</p>
+            {{else}}
+            <select id="org_id" name="org_id"
+                    class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                <option disabled selected value> -- Seleccione la organización -- </option>
+                {{range .orgs}}
+                <option value="{{.ID}}" 
+                        class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                    {{.OrgType | parseOrgType}} - {{.Name}}</option>
+                {{end}}
+            </select>
+        {{end}}
+    </select>
+    </div>
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <label for="book_nr"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Libro N° </label>
+        <input id="book_nr" name="book_nr" type="number" placeholder="Ej: 93"
+              class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200">
+    </div>
+</div>
+<!--<div class="flex flex-wrap -mx-3 mb-3">
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <label for="book_type"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> 
+            Tipo de Libro </label>
+        <select id="book_type" name="book_type"
+            class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            <option disabled selected value> -- Seleccione un tipo de libro -- </option>
+            {range $key, $value := .bookTypes}
+            <option value="{$key}"
+                    class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                    {$value}</option>
+            {end}
+        </select>
+    </div>
+</div>-->
+<!-- Date initial and final of book -->
+<div class="flex flex-wrap -mx-3 mb-3">
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <div x-data="dateAndYearInput(0)" class="antialiased sans-serif">
+            <label for="date_initial"
+                    class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Fecha de Apertura </label>
+            <div class="relative">
+                <!-- Display -->
+                <input type="hidden" id="date_initial" name="date_initial" x-model="date_initial">
+                <input type="text" readonly x-model="dateInitialDisplay" @click="open = !open" placeholder="Buscar..." 
+                    class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200">
+                <div class="absolute top-0 right-0 px-4 py-3">
+                    <svg class="h-6 w-6 text-gray-400"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <!-- Date -->
+                <div x-show="open" x-transition @click.away="closeCalendar"
+                    class="w-full bg-white p-4 absolute right-0 rounded-lg shadow z-10">
+                    <!-- Buttons and Display -->
+                    <div class="flex justify-between items-center mb-3">
+                        <!-- Months -->
+                        <button type="button" @click="prevMonth"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                            <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                        </button>
+                        <span x-text="MONTHS[month]" class="md:w-1/3 text-lg font-bold text-gray-700 text-center"></span>
+                        <button type="button" @click="nextMonth"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                            <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                        <!-- Year -->
+                        <button type="button" @click="prevYear"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                            <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                        </button>
+                        <input x-model="year" class="md:w-1/3 text-lg text-gray-700 font-bold text-center"/>
+                        <button type="button" @click="nextYear"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                            <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <!-- Calendar -->
+                    <div class="flex flex-wrap mb-3 -mx-1">
+                        <template x-for="(day, index) in DAYS" :key="index">
+                            <div style="width: 14.26%" class="px-1">
+                                <div x-text="day" class="text-gray-800 font-medium text-center text-xs"></div>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="flex flex-wrap -mx-1">
+                        <template x-for="blankday in blankdays">
+                            <div style="width: 14.28%" class="text-center border p-1 border-transparent text-sm"></div>
+                        </template>
+                        <template x-for="(date, dateIndex) in no_of_days" :key="dateIndex">
+                            <div style="width: 14.28%" class="px-1 mb-1">
+                                <div @click="setDate(date)" x-text="date"
+                                        class="cursor-pointer text-center text-sm leading-none rounded-full leading-loose transition ease-in-out duration-100"
+                                        :class="{'bg-blue-500 text-white': isToday(date) == true, 'text-gray-700 hover:bg-blue-200': isToday(date) == false }"></div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <div x-data="dateAndYearInput(1)" class="antialiased sans-serif">
+            <label for="date_initial"
+                    class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Fecha de Cierre </label>
+            <div class="relative">
+                <!-- Display -->
+                <input type="hidden" id="date_final" name="date_final" x-model="date_final">
+                <input type="text" readonly x-model="dateFinalDisplay" @click="open = !open" placeholder="Buscar..." 
+                    class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200">
+                <div class="absolute top-0 right-0 px-4 py-3">
+                    <svg class="h-6 w-6 text-gray-400"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <!-- Date -->
+                <div x-show="open" x-transition @click.away="closeCalendar"
+                    class="w-full bg-white p-4 absolute right-0 rounded-lg shadow z-10">
+                    <!-- Buttons and Display -->
+                    <div class="flex justify-between items-center mb-3">
+                        <!-- Months -->
+                        <button type="button" @click="prevMonth"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                            <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                        </button>
+                        <span x-text="MONTHS[month]" class="md:w-1/3 text-lg font-bold text-gray-700 text-center"></span>
+                        <button type="button" @click="nextMonth"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                            <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                        <!-- Year -->
+                        <button type="button" @click="prevYear"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                            <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                        </button>
+                        <input x-model="year" class="md:w-1/3 text-lg text-gray-700 font-bold text-center"/>
+                        <button type="button" @click="nextYear"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                            <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <!-- Calendar -->
+                    <div class="flex flex-wrap mb-3 -mx-1">
+                        <template x-for="(day, index) in DAYS" :key="index">
+                            <div style="width: 14.26%" class="px-1">
+                                <div x-text="day" class="text-gray-800 font-medium text-center text-xs"></div>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="flex flex-wrap -mx-1">
+                        <template x-for="blankday in blankdays">
+                            <div style="width: 14.28%" class="text-center border p-1 border-transparent text-sm"></div>
+                        </template>
+                        <template x-for="(date, dateIndex) in no_of_days" :key="dateIndex">
+                            <div style="width: 14.28%" class="px-1 mb-1">
+                                <div @click="setDate(date)" x-text="date"
+                                        class="cursor-pointer text-center text-sm leading-none rounded-full leading-loose transition ease-in-out duration-100"
+                                        :class="{'bg-blue-500 text-white': isToday(date) == true, 'text-gray-700 hover:bg-blue-200': isToday(date) == false }"></div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<div class="container flex justify-center mx-auto">
+  <div class="flex flex-row mx-auto mt-6">
+    <button hx-get="/getOrgBooks" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+            class="bg-red-400 hover:bg-red-300 py-2 px-4 mx-2 border-b-4 border-red-600 hover:border-red-400 rounded text-white font-bold">
+        Descartar </button>
+    <button type="submit"
+        class="bg-green-500 hover:bg-green-400 py-2 px-4 mx-2 border-b-4 border-green-600 hover:border-green-400 rounded text-white font-bold">
+        Crear Libro</button>
+  </div>
+</div>
+</form>
+<script>
+function dateAndYearInput(n) {
+    return {
+        // Variables
+        open: false,
+        no_of_days: [],
+        blankdays: [],
+        // General
+        init() {
+            let today = new Date();
+            //this.year_baptism = today.getFullYear();
+            this.date = today.getDate();
+            this.dateSel = this.date;
+            this.month = today.getMonth();
+            this.monthSel = this.month;
+            this.year = today.getFullYear();
+            this.yearSel = this.year;
+            if (n === 0) {
+                this.date_initial = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateInitialDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+            if (n === 1) {
+                this.date_final = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateFinalDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+            this.getDays();
+        },
+        getDays() {
+            let dayOfWeek = new Date(this.year, this.month).getDay();
+            let blankdaysArray = [];
+            for (var i = 1; i <= dayOfWeek; i++) {
+                blankdaysArray.push(i);
+            }
+            this.blankdays = blankdaysArray;
+            let daysInMonth = new Date(this.year, this.month + 1, 0).getDate();
+            let daysArray = [];
+            for (var i = 1; i <= daysInMonth; i++) {
+                daysArray.push(i);
+            }
+            this.no_of_days = daysArray;
+        },
+        // Calendar
+        closeChange() {
+            this.open = !this.open;
+            if (this.open == true) {
+                this.openCalendar();
+            }
+        },
+        saveData() {
+            if (n == 0) {
+                //this.year_baptism = this.year;
+                this.date_initial = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateInitialDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.year_baptism;
+            }
+            if (n === 1) {
+                this.date_final = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateFinalDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+        },
+        openCalendar() {
+            if (this.yearSel != "") {
+                this.month = this.monthSel;
+                this.year = this.yearSel;
+            }
+            this.getDays();
+        },
+        closeCalendar() {
+            this.open = false;
+        },
+        isToday(date) {
+            const currentDate = new Date(this.year, this.month, date);
+            const selectedDate = new Date(this.yearSel, this.monthSel, this.dateSel);
+            return selectedDate.toDateString() === currentDate.toDateString();
+        },
+        setDate(date) {
+            this.dateSel = date;
+            this.monthSel = this.month;
+            this.yearSel = this.year;
+            if (n === 0) {
+                this.date_initial = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateInitialDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+            if (n === 1) {
+                this.date_final = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateFinalDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+            this.closeCalendar();
+        },
+        // Buttons
+        prevMonth() {
+            if (this.month === 0) {
+                this.month = 11;
+                this.year--;
+            }
+            else
+                this.month--;
+            this.getDays();
+        },
+        nextMonth() {
+            if (this.month === 11) {
+                this.month = 0;
+                this.year++;
+            }
+            else
+                this.month++;
+            this.getDays();
+        },
+        prevYear() {
+            this.year--;
+            this.getDays();
+        },
+        nextYear() {
+            this.year++;
+            this.getDays();
+        }
+    }
+}
+</script>

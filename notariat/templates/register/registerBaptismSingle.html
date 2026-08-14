@@ -1,0 +1,179 @@
+<div class="flex items-center mb-6 md:mb-0">
+    <div class="flex-none">
+        <button hx-get="/getBookRegisters?book_id={{.BookBap.ID}}" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+            type="submit" class="bg-gray-500 hover:bg-gray-400 py-2 px-4 mx-2 border-b-4 border-gray-700 hover:border-gray-500 rounded text-sm text-white font-bold ">
+            Volver </button>
+    </div>
+    <div class="flex-auto pb-2">
+        <h1 class="text-2xl font-bold text-gray-700 text-center"> Registro de Bautismo</h1>
+    </div>
+    <div class="flex-none">
+        <button type="submit" disabled
+            class="bg-gray-200 hover:bg-gray-100 py-2 px-4 mx-2 border-b-4 border-gray-300 hover:border-gray-200 rounded text-sm text-white font-bold disabled:pointer-events-none cursor-not-allowed">
+            Corregir </button>
+    </div>
+</div>
+<div class="border-2 border-gray-200 p-8 my-6">
+<!-- Book Info -->
+<div class="flex flex-wrap -mx-3 mb-3">
+    <!-- Book -->
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <label for="book_id"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Libro </label>
+        {{$yearInitial := .BookBap.DateInitial | parseYear}}
+        {{$yearFinal := .BookBap.DateFinal | parseYear}}
+        <p class="min-h-12 p-3 bg-gray-200 rounded focus:outline-none text-gray-700 text-lg"> Libro N° {{.BookBap.BookNr}} <i class="text-sm">({{$yearInitial}}{{if ne $yearInitial $yearFinal}} - {{$yearFinal}}{{end}})</i></p>
+    </div>
+    <!-- Page -->
+    <div class="w-full md:w-1/6 px-3 mb-6 md:mb-0">
+        <label for="page_nr"
+        class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Página </label>
+        <p class="p-3 bg-gray-200 rounded focus:outline-none text-gray-700 text-lg">
+            {{.RegBap.PageNumber}}</p>
+    </div>
+    <!-- Register Number -->
+    <div class="w-full md:w-1/6 px-3 mb-6 md:mb-0">
+        <label for="reg_nr"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Registro N°</label>
+        <p class="min-h-12 p-3 bg-gray-200 rounded focus:outline-none text-gray-700 text-lg">
+            {{.RegBap.RegNumber}}</p>
+    </div>
+    <!-- Index Number-->
+    <div class="w-full md:w-1/6 px-3 mb-6 md:mb-0">
+        <label for="index_id"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Índice N° </label>
+        <p class="min-h-12 p-3 bg-gray-200 rounded focus:outline-none text-gray-700 text-lg">
+            {{.RegBap.IndexID}}</p>
+    </div>
+</div>
+<!-- Baptism Info -->
+<div class="flex flex-wrap -mx-3 mb-3">
+    <!-- Organization Baptism -->
+    <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+        <label for="org_baptism"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Bautizado en </label>
+        <p class="min-h-12 p-3 bg-gray-200 rounded focus:outline-none text-gray-700 text-lg"> 
+            {{.OrgBap.OrgType | parseOrgType}} - {{.OrgBap.Name}}</p>
+    </div>
+    <!-- Baptizer -->
+    <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+        <label for="baptizer"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Bautizado por </label>
+        <p class="p-3 bg-gray-200 rounded focus:outline-none text-gray-700 text-lg">
+            {{.RegBap.Baptizer}}</p>
+    </div>
+    <!-- Date and Year of Baptism -->
+    <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+        <label for="date_baptism"
+        class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Bautizado el día </label>
+        <p readonly id="date_baptism" name="date_baptism"
+            class="min-h-12 appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            {{.RegBap.DateBaptism | parseDate}}</p>
+    </div>
+</div>
+<!-- Baptized Info -->
+<div class="flex flex-wrap -mx-3 mb-3">
+    <!-- Baptized First Name -->
+    <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+        <label for="baptized_nf"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Primer Nombre Bautizado/a </label>
+        <p class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            {{.RegBap.BaptizedNameF}}</p>
+    </div>
+    <!-- Baptized Second Name -->
+    <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+        <label for="baptized_ns"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Segundo Nombre Bautizado/a </label>
+        <p class="min-h-12 appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            {{.RegBap.BaptizedNameS}}</p>
+    </div>
+    <!-- Baptized Surname Father -->
+    <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+        <label for="baptized_sf"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Apellido Paterno Bautizado/a </label>
+        <p class="min-h-12 appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            {{.RegBap.FatherSurname}}</p>
+    </div>
+    <!-- Baptized Surname Mother -->
+    <div class="w-full md:w-1/4 px-3 mb-6 md:mb-0">
+        <label for="baptized_sm"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Apellido Materno Bautizado/a </label>
+        <p class="min-h-12 appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            {{.RegBap.MotherSurname}}</p>
+    </div>
+</div>
+<div class="flex flex-wrap -mx-3 mb-3">
+    <!-- RUT -->
+    <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+        <label for="rut"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> RUT </label>
+        <p class="min-h-12 appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            {{.RegBap.RUT}}</p>
+    </div>
+    <!-- Birth Date -->
+    <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+        <label for="date_birth"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Fecha de nacimiento </label>
+        <p class="min-h-12 appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            {{.RegBap.DateBirth | parseDate}}</p>
+    </div>
+    <!-- Birth Place -->
+    <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+        <label for="place_birth"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Lugar de nacimiento </label>
+        <p class="min-h-12 appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+          {{.RegBap.PlaceBirth}}</p>
+    </div>
+</div>
+<!-- Parents -->
+<div class="flex flex-wrap -mx-3 mb-3">
+    <!-- Father -->
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <label for="father"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Padre </label>
+        <p class="min-h-12 appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            {{.RegBap.FatherName}} {{.RegBap.FatherSurname}}</p>
+    </div>
+    <!-- Mother -->
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <label for="mother"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Madre </label>
+        <p class="min-h-12 appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            {{.RegBap.MotherName}} {{.RegBap.MotherSurname}}</p>
+    </div>
+</div>
+<!-- Godparents -->
+<div class="flex flex-wrap -mx-3 mb-3">
+    <!-- Godfather -->
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <label for="godfather"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Padrino </label>
+        <p class="min-h-12 appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            {{.RegBap.Godfather}}</p>
+    </div>
+    <!-- Godmother -->
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <label for="godmother"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Madrina </label>
+        <p class="min-h-12 appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            {{.RegBap.Godmother}}</p>
+    </div>
+</div>
+</div>
+<!-- Button -->
+<div class="container flex justify-center mt-6">
+    <div class="flex flex-row mx-auto">
+        <form hx-post="/getCertificatesFromReg" hx-target="#content-div" hx-trigger="submit" hx-swap="innerHTML">
+        <input type="hidden" id="reg_id" name="reg_id" value='{{.RegBap.ID}}' readonly="readonly">
+        <button type="submit"
+            class="bg-blue-400 hover:bg-blue-300 py-2 px-4 mx-2 border-b-4 border-blue-600 hover:border-blue-400 rounded text-white font-bold">
+            Ver Certificados </button>
+    </form>
+    <form hx-post="/createCertificate" hx-target="#content-div" hx-trigger="submit" hx-swap="innerHTML">
+        <input type="hidden" id="reg_id" name="reg_id" value='{{.RegBap.ID}}' readonly="readonly">
+        <button type="submit"
+            class="bg-green-500 hover:bg-green-400 py-2 px-4 mx-2 border-b-4 border-green-600 hover:border-green-400 rounded text-white font-bold">
+            Nuevo Certificado </button>
+    </form>
+    </div>
+</div>

@@ -1,0 +1,83 @@
+<div class="flex items-center mb-6">
+    <div class="flex-1">
+        <button hx-get="{{if .RegID}}/getRegisterBaptism?reg_id={{.RegID}}{{else}}/getOrgBooks{{end}}" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+            type="submit" class="bg-gray-500 hover:bg-gray-400 py-2 px-4 mx-2 border-b-4 border-gray-700 hover:border-gray-500 rounded text-sm text-white font-bold ">
+            Volver </button>
+    </div>
+    <div class="flex-none">
+        <h1 class="text-2xl font-bold text-gray-700 text-center "> Certificados </h1>
+    </div>
+    <div class="flex-1">
+        <!--<button type="submit" disabled
+            class="bg-gray-200 hover:bg-gray-100 py-2 px-4 mx-2 border-b-4 border-gray-300 hover:border-gray-200 rounded text-sm text-white font-bold disabled:pointer-events-none cursor-not-allowed">
+            Generar </button>-->
+    </div>
+</div>
+<div id="table-content" class="relative flex flex-col h-full my-6 items-center">
+    <table class="w-full max-w-5xl text-left table-auto text-gray-700 bg-white shadow-md rounded-lg bg-clip-border">
+        <thead>
+        <tr>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Registro N°
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Certificado N°
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Fecha de Validez
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    PDF
+                </p>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {{range .certs_bap}}
+            <tr class="hover:bg-slate-50">
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500 mb-2"><b>{{.Register.RegNumber}}:</b> {{.Register.BaptizedNameF}} {{.Register.FatherSurname}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <form hx-post="/getRegisterBaptism" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML">
+                        <input type="hidden" id="reg_id" name="reg_id" value='{{.RegID}}' readonly="readonly">
+                        <button type="submit"
+                                class="bg-blue-400 hover:bg-blue-300 py-2 px-4 mx-2 border-b-4 border-blue-500 hover:border-blue-400 rounded text-sm text-white font-bold">
+                            Ver </button>
+                    </form>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500">{{.ID}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500">{{.DateEmission | parseDate}} - {{.DateExpiration | parseDate}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <!-- hx-boost="true" action="/downloadPDFCertificateBaptism" method="post"> -->
+                    <form action="/downloadPDFCertificateBaptism" method="post">  <!--hx-post="/downloadPDFCertificateBaptism" hx-target="#content-div" hx-swap="innerHTML" -->
+                        <input type="hidden" id="cert_id" name="cert_id" value="{{.ID}}">
+                        <input type="hidden" id="cert_uuid" name="cert_uuid" value="{{.UUID}}">
+                        <input type="hidden" id="org_emisor" name="org_emisor" value="{{.OrgEmisor}}">
+                        <input type="hidden" id="reg_id" name="reg_id" value="{{.RegID}}">
+                        <input type="hidden" id="user_val" name="user_val" value="{{.UserValidator}}">
+                        <input type="hidden" id="date_emi" name="date_emi" value="{{.DateEmission | parseDate}}">
+                        <input type="hidden" id="date_exp" name="date_exp" value="{{.DateExpiration | parseDate}}">
+                        <button type="submit"
+                                class="bg-amber-500 hover:bg-amber-400 py-2 px-4 mx-2 border-b-4 border-amber-600 hover:border-amber-400 rounded text-sm text-white font-bold">
+                            Descargar </button>
+                    </form>
+                </td>
+            </tr>
+        {{end}}
+        </tbody>
+    </table>
+</div>
