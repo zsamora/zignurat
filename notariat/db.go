@@ -116,12 +116,22 @@ func GetMembers(db *gorm.DB) []Member {
 }
 func GetMembersFromOrg(db *gorm.DB, orgId uint) []Member {
 	var members []Member
-	result := db.Preload("Organization").Find(&members, Member{OrgID: orgId})
+	result := db.Preload("Organization").Where("org_id = ?", orgId).Find(&members)
 	if result.Error != nil {
 		log.Printf("Error obtaining members: %s", result.Error)
 		return nil
 	}
 	log.Printf("N° members from organization %d in database: %d", orgId, result.RowsAffected)
+	return members
+}
+func GetMembersFromOrgAndRole(db *gorm.DB, orgId uint, role uint8) []Member {
+	var members []Member
+	result := db.Preload("Organization").Where("org_id = ? AND role = ?", orgId, role).Find(&members)
+	if result.Error != nil {
+		log.Printf("Error obtaining members: %s", result.Error)
+		return nil
+	}
+	log.Printf("N° members from organization %d with role %d in database: %d", orgId, role, result.RowsAffected)
 	return members
 }
 func createMember(db *gorm.DB, member Member) {
@@ -145,7 +155,7 @@ func getBookFromId(db *gorm.DB, bookId uint) Book {
 }
 func getBooksFromOrg(db *gorm.DB, orgId uint) []Book {
 	var books []Book
-	result := db.Order("book_nr").Find(&books, Book{OrgID: orgId})
+	result := db.Order("book_nr").Where("org_id = ?", orgId).Find(&books)
 	if result.Error != nil {
 		log.Printf("Error obtaining books: %s", result.Error)
 		return nil
@@ -203,7 +213,7 @@ func getRegisterBaptismFromId(db *gorm.DB, regId uint) RegisterBaptism {
 }
 func getRegistersBaptismFromBook(db *gorm.DB, bookId uint) []RegisterBaptism {
 	var regs []RegisterBaptism
-	result := db.Find(&regs, RegisterBaptism{BookID: bookId})
+	result := db.Where("book_id = ?", bookId).Find(&regs)
 	if result.Error != nil {
 		log.Printf("Error obtaining baptism registers: %s", result.Error)
 		return nil
@@ -239,7 +249,7 @@ func createCertificateBaptism(db *gorm.DB, certBaptism CertificateBaptism) uint 
 }
 func getCertificatesBaptismFromOrg(db *gorm.DB, orgId uint) []CertificateBaptism {
 	var certificates []CertificateBaptism
-	result := db.Preload("Register").Find(&certificates, CertificateBaptism{OrgEmisor: orgId})
+	result := db.Preload("Register").Where("org_emisor = ?", orgId).Find(&certificates)
 	if result.Error != nil {
 		log.Printf("Error obtaining baptism certificate: %s", result.Error)
 		return nil
@@ -249,7 +259,7 @@ func getCertificatesBaptismFromOrg(db *gorm.DB, orgId uint) []CertificateBaptism
 }
 func getCertificatesBaptismFromOrgAndReg(db *gorm.DB, orgId uint, regId uint) []CertificateBaptism {
 	var certificates []CertificateBaptism
-	result := db.Preload("Register").Find(&certificates, CertificateBaptism{OrgEmisor: orgId, RegID: regId})
+	result := db.Preload("Register").Where("org_emisor = ? AND reg_id = ?", orgId, regId).Find(&certificates)
 	if result.Error != nil {
 		log.Printf("Error obtaining baptism certificate: %s", result.Error)
 		return nil

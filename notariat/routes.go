@@ -30,7 +30,8 @@ var (
 	}
 	memberRoles = map[uint8]string{
 		0: "Administrador",
-		1: "Miembro",
+		1: "Validador",
+		2: "Miembro",
 	}
 )
 
@@ -57,7 +58,7 @@ func AdminRoutes(router *gin.Engine, db *gorm.DB) {
 		admin.GET("/organizations", Organizations(db))
 		admin.GET("/users", Users(db))
 	}
-	router.GET("/createOrg", CreateOrgForm(db))
+	router.GET("/createOrg", CreateOrgForm())
 	router.POST("/createOrg", CreateOrg(db))
 	router.GET("/createUser", CreateUserForm())
 	router.POST("/createUser", CreateUser(db))
@@ -81,24 +82,30 @@ func OrgRoutes(router *gin.Engine, db *gorm.DB) {
 	}
 }
 func BookRoutes(router *gin.Engine, db *gorm.DB) {
-	router.POST("/createBook", CreateBookForm(db))
-	router.POST("/addBook", AddBook(db))
-	router.GET("/getOrgBooks", Books(db))
-	router.POST("/getOrgBooks", Books(db))
+	g := router.Group("")
+	g.Use(utils.AuthMiddleware(2))
+	g.POST("/createBook", CreateBookForm(db))
+	g.POST("/addBook", AddBook(db))
+	g.GET("/getOrgBooks", Books(db))
+	g.POST("/getOrgBooks", Books(db))
 }
 func RegisterRoutes(router *gin.Engine, db *gorm.DB) {
-	router.GET("/getBookRegisters", GetBookRegisters(db))
-	router.POST("/getBookRegisters", GetBookRegisters(db))
-	router.POST("/createRegisterBaptism", CreateRegisterBaptismForm(db))
-	router.POST("/addRegisterBaptism", AddRegisterBaptism(db))
-	router.GET("/getRegisterBaptism", GetRegisterBaptism(db))
-	router.POST("/getRegisterBaptism", GetRegisterBaptism(db))
+	g := router.Group("")
+	g.Use(utils.AuthMiddleware(2))
+	g.GET("/getBookRegisters", GetBookRegisters(db))
+	g.POST("/getBookRegisters", GetBookRegisters(db))
+	g.POST("/createRegisterBaptism", CreateRegisterBaptismForm(db))
+	g.POST("/addRegisterBaptism", AddRegisterBaptism(db))
+	g.GET("/getRegisterBaptism", GetRegisterBaptism(db))
+	g.POST("/getRegisterBaptism", GetRegisterBaptism(db))
 }
 func CertificateRoutes(router *gin.Engine, db *gorm.DB) {
-	router.POST("/getCertificatesFromReg", GetCertificatesFromReg(db))
-	router.POST("/createCertificate", CreateCertificateForm(db))
-	router.POST("/addCertificateBaptism", AddCertificateBaptism(db))
-	router.POST("/downloadPDFCertificateBaptism", DownloadPDFCertificateBaptism(db))
+	g := router.Group("")
+	g.Use(utils.AuthMiddleware(2))
+	g.POST("/getCertificatesFromReg", GetCertificatesFromReg(db))
+	g.POST("/createCertificate", CreateCertificateForm(db))
+	g.POST("/addCertificateBaptism", AddCertificateBaptism(db))
+	g.POST("/downloadPDFCertificateBaptism", DownloadPDFCertificateBaptism(db))
 }
 func InternalRoutes(router *gin.Engine, db *gorm.DB) {
 	router.GET("/internal/organizations", GetOrganizationsJSON(db))
@@ -262,7 +269,7 @@ func Organizations(db *gorm.DB) gin.HandlerFunc {
 		})
 	}
 }
-func CreateOrgForm(db *gorm.DB) gin.HandlerFunc {
+func CreateOrgForm() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.HTML(http.StatusOK, "orgCreate.html", gin.H{
 			"orgTypes": orgTypes,
@@ -530,13 +537,13 @@ func CreateCertificateForm(db *gorm.DB) gin.HandlerFunc {
 		org := GetOrganizationFromId(db, orgId)
 		orgBap := GetOrganizationFromId(db, reg.OrgBaptism)
 		bookBap := getBookFromId(db, reg.BookID)
-		users := GetUsers(db)
+		validators := GetMembersFromOrgAndRole(db, org.ID, 1)
 		c.HTML(http.StatusOK, "certificateCreate.html", gin.H{
-			"RegBap":  reg,
-			"Org":     org,
-			"OrgBap":  orgBap,
-			"BookBap": bookBap,
-			"users":   users,
+			"RegBap":     reg,
+			"Org":        org,
+			"OrgBap":     orgBap,
+			"BookBap":    bookBap,
+			"validators": validators,
 		})
 	}
 }
@@ -582,7 +589,7 @@ func DownloadPDFCertificateBaptism(db *gorm.DB) gin.HandlerFunc {
 		}
 		userValInt, _ := utils.ParseInt(c.PostForm("user_val"))
 		userValidator := uint(userValInt)
-		user := GetUserFromId(db, userValidator)
+		validator := GetMemberFromId(db, userValidator)
 		certPDF := CertificateBaptismPDF{
 			CertID:             certId,
 			CertUUID:           certUUID,
@@ -605,7 +612,7 @@ func DownloadPDFCertificateBaptism(db *gorm.DB) gin.HandlerFunc {
 			RegUserMother:      reg.MotherName + " " + reg.MotherSurname,
 			RegUserGodfather:   reg.Godfather,
 			RegUserGodmother:   reg.Godmother,
-			RegValidator:       user.Names + " " + user.Surnames,
+			RegValidator:       validator.Names + " " + validator.Surnames,
 		}
 		pdfFilepath := createPDFCertificateBaptism(certPDF)
 		if pdfFilepath == "" {

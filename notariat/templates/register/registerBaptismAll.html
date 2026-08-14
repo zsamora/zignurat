@@ -1,6 +1,6 @@
 <div class="flex items-center mb-6 md:mb-0">
     <div class="flex-none">
-        <button hx-get="/getOrgBooks" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+        <button hx-get="/getOrgBooks?org_id={{.OrgID}}" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
             type="submit" class="bg-gray-500 hover:bg-gray-400 py-2 px-4 mx-2 border-b-4 border-gray-700 hover:border-gray-500 rounded text-sm text-white font-bold ">
             Volver </button>
     </div>

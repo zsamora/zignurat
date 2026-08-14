@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS certificate_baptisms (
     id               BIGSERIAL PRIMARY KEY,
     org_emisor       BIGINT NOT NULL REFERENCES organizations(id),
     reg_id           BIGINT NOT NULL REFERENCES register_baptisms(id),
-    user_validator   BIGINT NOT NULL REFERENCES users(id),
+    user_validator   BIGINT NOT NULL REFERENCES members(id),
     date_emission    TIMESTAMPTZ,
     date_expiration  TIMESTAMPTZ,
     uuid             UUID NOT NULL DEFAULT gen_random_uuid(),
