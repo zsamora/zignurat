@@ -21,10 +21,16 @@ var (
 	adminNavbarItems = map[string]string{
 		"/admin/organizations": "Organizaciones",
 		"/admin/users":         "Usuarios",
+		"/admin/members":       "Miembros",
 	}
 	orgNavbarItems = map[string]string{
 		"/org/books":        "Registro",
 		"/org/certificates": "Verificación",
+		"/org/members":      "Miembros",
+	}
+	memberRoles = map[uint8]string{
+		0: "Administrador",
+		1: "Miembro",
 	}
 )
 
@@ -56,12 +62,22 @@ func AdminRoutes(router *gin.Engine, db *gorm.DB) {
 	router.GET("/createUser", CreateUserForm())
 	router.POST("/createUser", CreateUser(db))
 }
+func MemberRoutes(router *gin.Engine, db *gorm.DB) {
+	admin := router.Group("/admin")
+	admin.Use(utils.AuthMiddleware(2))
+	{
+		admin.GET("/members", Members(db))
+	}
+	router.GET("/createMember", CreateMemberForm(db))
+	router.POST("/createMember", CreateMember(db))
+}
 func OrgRoutes(router *gin.Engine, db *gorm.DB) {
 	org := router.Group("/org")
 	org.Use(utils.AuthMiddleware(2))
 	{
 		org.GET("/books", Books(db))
 		org.GET("/certificates", Certificates(db))
+		org.GET("/members", OrgMembers(db))
 	}
 }
 func BookRoutes(router *gin.Engine, db *gorm.DB) {
@@ -248,24 +264,21 @@ func Organizations(db *gorm.DB) gin.HandlerFunc {
 }
 func CreateOrgForm(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		users := GetUsers(db)
 		c.HTML(http.StatusOK, "orgCreate.html", gin.H{
 			"orgTypes": orgTypes,
-			"users":    users,
 		})
 	}
 }
 func CreateOrg(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		typeIdInt, _ := utils.ParseInt(c.PostForm("type_id"))
-		userIdInt, _ := utils.ParseInt(c.PostForm("user_id"))
 		org := Organization{
-			OrgType: uint8(typeIdInt),
-			Name:    c.PostForm("name"),
-			Diocese: c.PostForm("diocese"),
-			Commune: c.PostForm("commune"),
-			Address: c.PostForm("address"),
-			AdminID: uint(userIdInt),
+			OrgType:  uint8(typeIdInt),
+			Name:     c.PostForm("name"),
+			Diocese:  c.PostForm("diocese"),
+			Commune:  c.PostForm("commune"),
+			Address:  c.PostForm("address"),
+			SealPath: c.PostForm("seal_path"),
 		}
 		createOrganization(db, org)
 		orgs := GetOrganizations(db)
@@ -290,6 +303,44 @@ func CreateUser(db *gorm.DB) gin.HandlerFunc {
 		users := GetUsers(db)
 		c.HTML(http.StatusOK, "users.html", gin.H{
 			"users": users,
+		})
+	}
+}
+
+func Members(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		members := GetMembers(db)
+		c.HTML(http.StatusOK, "members.html", gin.H{
+			"members":     members,
+			"memberRoles": memberRoles,
+		})
+	}
+}
+func CreateMemberForm(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		orgs := GetOrganizations(db)
+		c.HTML(http.StatusOK, "memberCreate.html", gin.H{
+			"orgs":        orgs,
+			"memberRoles": memberRoles,
+		})
+	}
+}
+func CreateMember(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		orgIdInt, _ := utils.ParseInt(c.PostForm("org_id"))
+		roleInt, _ := utils.ParseInt(c.PostForm("role"))
+		member := Member{
+			Names:         c.PostForm("names"),
+			Surnames:      c.PostForm("surnames"),
+			Role:          uint8(roleInt),
+			OrgID:         uint(orgIdInt),
+			SignaturePath: c.PostForm("signature_path"),
+		}
+		createMember(db, member)
+		members := GetMembers(db)
+		c.HTML(http.StatusOK, "members.html", gin.H{
+			"members":     members,
+			"memberRoles": memberRoles,
 		})
 	}
 }
@@ -340,6 +391,16 @@ func Certificates(db *gorm.DB) gin.HandlerFunc {
 		certsBap := getCertificatesBaptismFromOrg(db, orgId)
 		c.HTML(http.StatusOK, "certificatesOrg.html", gin.H{
 			"certs_bap": certsBap,
+		})
+	}
+}
+func OrgMembers(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		orgId := currentOwnerOrgID(db, c)
+		members := GetMembersFromOrg(db, orgId)
+		c.HTML(http.StatusOK, "members.html", gin.H{
+			"members":     members,
+			"memberRoles": memberRoles,
 		})
 	}
 }
@@ -468,14 +529,14 @@ func CreateCertificateForm(db *gorm.DB) gin.HandlerFunc {
 		}
 		org := GetOrganizationFromId(db, orgId)
 		orgBap := GetOrganizationFromId(db, reg.OrgBaptism)
-		adminBap := GetUserFromId(db, orgBap.AdminID)
 		bookBap := getBookFromId(db, reg.BookID)
+		users := GetUsers(db)
 		c.HTML(http.StatusOK, "certificateCreate.html", gin.H{
-			"RegBap":   reg,
-			"Org":      org,
-			"OrgBap":   orgBap,
-			"BookBap":  bookBap,
-			"AdminBap": adminBap,
+			"RegBap":  reg,
+			"Org":     org,
+			"OrgBap":  orgBap,
+			"BookBap": bookBap,
+			"users":   users,
 		})
 	}
 }

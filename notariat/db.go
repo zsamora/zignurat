@@ -94,6 +94,45 @@ func createUser(db *gorm.DB, user User) {
 	log.Printf("N° rows inserted: %d", result.RowsAffected)
 }
 
+func GetMemberFromId(db *gorm.DB, memberId uint) Member {
+	var member Member
+	result := db.First(&member, memberId)
+	if result.Error != nil {
+		log.Printf("Error retrieving data: %s", result.Error)
+		return member
+	}
+	log.Printf("N° members in database: %d", result.RowsAffected)
+	return member
+}
+func GetMembers(db *gorm.DB) []Member {
+	var members []Member
+	result := db.Preload("Organization").Find(&members)
+	if result.Error != nil {
+		log.Printf("Error retrieving data: %s", result.Error)
+		return nil
+	}
+	log.Printf("N° members in database: %d", result.RowsAffected)
+	return members
+}
+func GetMembersFromOrg(db *gorm.DB, orgId uint) []Member {
+	var members []Member
+	result := db.Preload("Organization").Find(&members, Member{OrgID: orgId})
+	if result.Error != nil {
+		log.Printf("Error obtaining members: %s", result.Error)
+		return nil
+	}
+	log.Printf("N° members from organization %d in database: %d", orgId, result.RowsAffected)
+	return members
+}
+func createMember(db *gorm.DB, member Member) {
+	result := db.Create(&member)
+	log.Printf("Member ID: %d", member.ID)
+	if result.Error != nil {
+		log.Printf("Error inserting member: %s", result.Error)
+	}
+	log.Printf("N° rows inserted: %d", result.RowsAffected)
+}
+
 func getBookFromId(db *gorm.DB, bookId uint) Book {
 	var book Book
 	result := db.First(&book, bookId)

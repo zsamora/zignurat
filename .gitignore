@@ -18,5 +18,7 @@ Thumbs.db
 /notariat/notariat
 /notariat/notariat-app
 /notariat/pdf/*.pdf
-/notariat/img/
+/notariat/img/*
+!/notariat/img/firmaparroco.jpg
+!/notariat/img/timbreparroquial.jpg
 /notariat/ttf/

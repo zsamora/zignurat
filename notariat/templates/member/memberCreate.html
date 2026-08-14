@@ -1,0 +1,62 @@
+<h1 class="text-2xl text-gray-700 font-bold text-center">Crear nuevo miembro</h1>
+<p class="font-normal text-m text-gray-400 md:px-2 py-2 text-center">Ingrese la información requerida</p>
+<form hx-post="/createMember" hx-target="#content-div" hx-swap="innerHTML" class="mt-8 space-y-4">
+    <!-- Names and Surnames -->
+    <div class="flex flex-wrap -mx-3 mb-3">
+        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+            <label for="names"
+                   class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Nombre(s) </label>
+            <input id="names" name="names" type="text" placeholder="Ej: Ana Belén"
+                   class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+        </div>
+        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+            <label for="surnames"
+                   class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Apellido(s) </label>
+            <input id="surnames" name="surnames" type="text" placeholder="Ej: Rodríguez Fuentes"
+                   class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+        </div>
+    </div>
+    <!-- Organization -->
+    <div class="flex flex-wrap -mx-3 mb-3">
+        <label for="org_id"
+               class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Organización </label>
+        <select id="org_id" name="org_id"
+                class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                <option disabled selected value> -- Seleccione una organización -- </option>
+                {{range .orgs}}
+                <option value='{{.ID}}'
+                      class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">{{.Name}}</option>
+                {{end}}
+        </select>
+    </div>
+    <!-- Role -->
+    <div class="flex flex-wrap -mx-3 mb-3">
+        <label for="role"
+               class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Rol </label>
+        <select id="role" name="role"
+                class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                <option disabled selected value> -- Seleccione un rol -- </option>
+                {{range $key, $value := .memberRoles}}
+                <option value='{{$key}}'
+                      class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">{{$value}}</option>
+                {{end}}
+        </select>
+    </div>
+    <!-- Signature -->
+    <div class="flex flex-wrap -mx-3 mb-3">
+        <div class="w-full px-3 mb-6 md:mb-0">
+            <label for="signature_path"
+                   class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Ruta de la Firma </label>
+            <input id="signature_path" name="signature_path" type="text" placeholder="Ej: img/members/ana.jpg"
+                   class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+        </div>
+    </div>
+    <!-- Buttons -->
+    <div class="container flex justify-center mx-auto">
+        <div class="flex flex-row mx-auto">
+            <button type="submit"
+                    class="text-white font-bold bg-blue-500 hover:bg-blue-400 py-2 px-4 mx-2 border-b-4 border-blue-700 hover:border-blue-500 rounded">
+                Enviar </button>
+        </div>
+    </div>
+</form>

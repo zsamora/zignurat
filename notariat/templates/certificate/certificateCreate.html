@@ -28,9 +28,14 @@
     <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
         <label for="user_val"
             class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Encargado de Validación del Certificado </label>
-        <input type="hidden" id="user_val" name="user_val" value='{{.AdminBap.ID}}' readonly="readonly">
-        <p class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-            {{.AdminBap.Names}} {{.AdminBap.Surnames}} </p>
+        <select id="user_val" name="user_val"
+                class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                <option disabled selected value> -- Seleccione un usuario validador -- </option>
+                {{range .users}}
+                <option value='{{.ID}}'
+                      class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">{{.Names}} {{.Surnames}}</option>
+                {{end}}
+        </select>
     </div>
 </div>
 <div class="flex flex-wrap -mx-3 mb-3">

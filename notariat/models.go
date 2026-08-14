@@ -17,14 +17,25 @@ type User struct {
 
 type Organization struct {
 	gorm.Model
-	OrgType uint8
-	Name    string
-	Diocese string
-	Commune string
-	Address string
-	AdminID uint
-	Books   []Book    `gorm:"foreignKey:OrgID"`
-	UUID    uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();<-:create"`
+	OrgType  uint8
+	Name     string
+	Diocese  string
+	Commune  string
+	Address  string
+	SealPath string
+	Books    []Book    `gorm:"foreignKey:OrgID"`
+	UUID     uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();<-:create"`
+}
+
+type Member struct {
+	gorm.Model
+	Names         string
+	Surnames      string
+	Role          uint8
+	OrgID         uint
+	Organization  Organization `gorm:"foreignKey:OrgID"`
+	SignaturePath string
+	UUID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();<-:create"`
 }
 
 type Book struct {

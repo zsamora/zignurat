@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS organizations (
     diocese     TEXT NOT NULL,
     commune     TEXT NOT NULL,
     address     TEXT NOT NULL,
-    admin_id    BIGINT NOT NULL REFERENCES users(id),
+    seal_path   TEXT,
     uuid        UUID NOT NULL DEFAULT gen_random_uuid(),
     created_at  TIMESTAMPTZ,
     updated_at  TIMESTAMPTZ,
@@ -28,6 +28,23 @@ CREATE TABLE IF NOT EXISTS organizations (
     );
 
 CREATE INDEX IF NOT EXISTS idx_organizations_deleted_at ON organizations (deleted_at);
+
+CREATE TABLE IF NOT EXISTS members (
+    id              BIGSERIAL PRIMARY KEY,
+    names           TEXT NOT NULL,
+    surnames        TEXT NOT NULL,
+    role            SMALLINT NOT NULL DEFAULT 0,
+    org_id          BIGINT NOT NULL REFERENCES organizations(id),
+    signature_path  TEXT,
+    uuid            UUID NOT NULL DEFAULT gen_random_uuid(),
+    created_at      TIMESTAMPTZ,
+    updated_at      TIMESTAMPTZ,
+    deleted_at      TIMESTAMPTZ,
+
+    CONSTRAINT chk_member_role CHECK (role BETWEEN 0 AND 255)
+    );
+
+CREATE INDEX IF NOT EXISTS idx_members_deleted_at ON members (deleted_at);
 
 CREATE TABLE IF NOT EXISTS books (
     id            BIGSERIAL PRIMARY KEY,

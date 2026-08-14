@@ -36,6 +36,7 @@ func NotariatController() http.Handler {
 	LandingRoutes(router)
 	LoginRoutes(router)
 	AdminRoutes(router, db)
+	MemberRoutes(router, db)
 	OrgRoutes(router, db)
 	BookRoutes(router, db)
 	RegisterRoutes(router, db)

@@ -1,0 +1,56 @@
+{{define "memberTable"}}
+<div class="relative flex flex-col w-full h-full text-gray-700 bg-white shadow-md rounded-lg bg-clip-border mb-3">
+    <table class="w-full text-left table-auto min-w-max">
+        <thead>
+        <tr>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    ID
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Nombre(s)
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Apellido(s)
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Organización
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Rol
+                </p>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {{range .members}}
+            <tr class="hover:bg-slate-50">
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="font-bold text-xs text-slate-500">{{.ID}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500">{{.Names}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500">{{.Surnames}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500">{{.Organization.Name}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500">{{index $.memberRoles .Role}}</p>
+                </td>
+            </tr>
+        {{end}}
+        </tbody>
+    </table>
+</div>
+{{end}}
