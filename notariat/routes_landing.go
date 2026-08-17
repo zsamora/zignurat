@@ -24,6 +24,7 @@ var (
 		"/org/certificates": "Verificación",
 		"/org/members":      "Miembros",
 		"/org/requests":     "Solicitudes",
+		"/org/search":       "Búsqueda",
 	}
 	userNavbarItems = map[string]string{
 		"/requestCertificate": "Solicitar Certificado",

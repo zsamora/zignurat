@@ -306,3 +306,14 @@ func getCertificateRequestsFromOrg(db *gorm.DB, orgID uint) []CertificateRequest
 	log.Printf("N° certificate requests from organization %d in database: %d", orgID, result.RowsAffected)
 	return requests
 }
+
+func getBooksIndexBaptismFromOrg(db *gorm.DB, orgID uint) []Book {
+	var booksIndex []Book
+	result := db.Preload("IndexBaptism", func(tx *gorm.DB) *gorm.DB { return tx.Limit(30) }).Find(&booksIndex, Book{OrgID: orgID})
+	if result.Error != nil {
+		log.Printf("Error obtaining books with baptism index: %s", result.Error)
+		return nil
+	}
+	log.Printf("N° books with baptism index from org %d in database: %d", orgID, result.RowsAffected)
+	return booksIndex
+}

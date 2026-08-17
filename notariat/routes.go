@@ -62,6 +62,17 @@ func OrgRoutes(router *gin.Engine, db *gorm.DB) {
 	{
 		org.GET("/books", Books(db))
 		org.GET("/certificates", Certificates(db))
+		org.GET("/search", IndexSearch(db))
+	}
+}
+func IndexSearch(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		orgID := currentOwnerOrgID(db, c)
+		booksIndex := getBooksIndexBaptismFromOrg(db, orgID)
+		c.HTML(http.StatusOK, "indexSearch.html", gin.H{
+			"OrgID":      orgID,
+			"booksIndex": booksIndex,
+		})
 	}
 }
 func BookRoutes(router *gin.Engine, db *gorm.DB) {

@@ -1,0 +1,98 @@
+{{define "indexAllTable"}}
+<div id="table-content" class="relative flex flex-col w-full h-full overflow-scroll text-gray-700 bg-white shadow-md rounded-lg bg-clip-border my-6">
+    <table class="w-full text-left table-auto min-w-max">
+        <thead>
+        <tr>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Apellido Paterno
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Apellido Materno
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Primer Nombre
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Segundo Nombre
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Libro
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Página
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Registro
+                </p>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {{$orgID := .OrgID}}
+        {{range .booksIndex}}
+        {{$bookID := .ID}}
+        {{$bookNr := .BookNr}}
+        {{$dateInitial := .DateInitial}}
+        {{$dateFinal := .DateFinal}}
+            {{range .IndexBaptism}}
+            <tr class="hover:bg-slate-50">
+            <td class="p-4 border-b border-slate-200 py-5">
+                <p class="text-sm font-bold text-slate-500">{{.UserSurnameF}}</p>
+            </td>
+            <td class="p-4 border-b border-slate-200 py-5">
+                <p class="text-sm text-slate-500">{{.UserSurnameM}}</p>
+            </td>
+            <td class="p-4 border-b border-slate-200 py-5">
+                <p class="text-sm font-bold text-slate-500">{{.UserNameFirst}}</p>
+            </td>
+            <td class="p-4 border-b border-slate-200 py-5">
+                <p class="text-sm text-slate-500">{{.UserNameSecond}}</p>
+            </td>
+            <td class="p-4 border-b border-slate-200 py-5">
+                {{$yearInitial := $dateInitial | parseYear}}
+                {{$yearFinal := $dateFinal | parseYear}}
+                <p class="text-sm text-slate-500">{{$bookNr}} <i class="font-normal italic text-xs">({{$yearInitial}}{{if ne $yearInitial $yearFinal}} - {{$yearFinal}}{{end}})</i></p>
+            </td>
+            <td class="p-4 border-b border-slate-200 py-5">
+                <p class="text-sm text-slate-500">{{.PageNumber}}</p>
+            </td>
+            {{if eq .RegID 0}}
+            <td class="p-4 border-b border-slate-200 py-5">
+                <form hx-post="/org/createRegisterBaptism" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML">
+                    <input type="hidden" id="org_id" name="org_id" value='{{$orgID}}' readonly="readonly">
+                    <input type="hidden" id="book_id" name="book_id" value='{{$bookID}}' readonly="readonly">
+                    <button type="submit"
+                        class="bg-red-400 hover:bg-red-300 py-2 px-4 mx-2 border-b-4 border-red-600 hover:border-red-400 rounded text-sm text-white font-bold">
+                        Crear </button>
+                </form>
+            </td>
+            {{else}}
+            <td class="p-4 border-b border-slate-200 py-5">
+                <form hx-post="/org/getRegisterBaptism" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML">
+                    <input type="hidden" id="reg_id" name="reg_id" value='{{.RegID}}' readonly="readonly">
+                    <button type="submit"
+                        class="bg-blue-400 hover:bg-blue-300 py-2 px-4 mx-2 border-b-4 border-blue-600 hover:border-blue-400 rounded text-sm text-white font-bold">
+                        Ver </button>
+                </form>
+            </td>
+            {{end}}
+            </tr>
+            {{end}}
+        {{end}}
+        </tbody>
+    </table>
+</div>
+{{end}}
