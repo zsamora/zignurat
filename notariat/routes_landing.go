@@ -23,11 +23,17 @@ var (
 		"/org/books":        "Registro",
 		"/org/certificates": "Verificación",
 		"/org/members":      "Miembros",
+		"/org/requests":     "Solicitudes",
+	}
+	userNavbarItems = map[string]string{
+		"/requestCertificate": "Solicitar Certificado",
+		"/getRequests":        "Ver Solicitudes",
 	}
 	accRoleNames = map[uint8]string{
 		accRoleAdministrador: "Administrador",
 		accRoleOrganizacion:  "Organización",
 		accRoleValidador:     "Validador",
+		accRoleUsuario:       "Usuario",
 	}
 )
 
@@ -158,6 +164,14 @@ func getRoleHome(c *gin.Context, role uint8, name string) {
 		c.HTML(http.StatusOK, "home.html", gin.H{
 			"LoggedIn":    true,
 			"navbarItems": orgNavbarItems,
+			"Name":        name,
+			"Role":        accRoleNames[role],
+		})
+	case 4:
+		log.Printf("## Usuario")
+		c.HTML(http.StatusOK, "home.html", gin.H{
+			"LoggedIn":    true,
+			"navbarItems": userNavbarItems,
 			"Name":        name,
 			"Role":        accRoleNames[role],
 		})

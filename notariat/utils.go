@@ -14,6 +14,17 @@ var bookTypes = map[uint8]string{
 	2: "Bautismo",
 }
 
+var sacramentTypes = map[uint8]string{
+	0: "Bautismo",
+	1: "Confirmación",
+	2: "Matrimonio",
+}
+
+var certificatePurposes = map[uint8]string{
+	0: "Inscripción Colegio",
+	1: "Otro",
+}
+
 func ParseOrgType(orgTypeID uint8) string {
 	orgName, found := orgTypes[orgTypeID]
 	if found {
@@ -29,5 +40,23 @@ func ParseBookType(bookTypeID uint8) string {
 		return bookName
 	}
 	log.Printf("Key %d not found in book types", bookTypeID)
+	return ""
+}
+
+func ParseSacrType(sacrTypeID uint8) string {
+	sacrName, found := sacramentTypes[sacrTypeID]
+	if found {
+		return sacrName
+	}
+	log.Printf("Key %d not found in sacrament types", sacrTypeID)
+	return ""
+}
+
+func ParseCertPurpose(certPurposeID uint8) string {
+	purposeName, found := certificatePurposes[certPurposeID]
+	if found {
+		return purposeName
+	}
+	log.Printf("Key %d not found in certificate purposes", certPurposeID)
 	return ""
 }

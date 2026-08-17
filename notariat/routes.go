@@ -25,6 +25,7 @@ const (
 	accRoleAdministrador uint8 = 1
 	accRoleOrganizacion  uint8 = 2
 	accRoleValidador     uint8 = 3
+	accRoleUsuario       uint8 = 4
 )
 
 func AdminRoutes(router *gin.Engine, db *gorm.DB) {

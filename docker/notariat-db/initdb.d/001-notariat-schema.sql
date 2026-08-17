@@ -127,3 +127,31 @@ CREATE TABLE IF NOT EXISTS certificate_baptisms (
     );
 
 CREATE INDEX IF NOT EXISTS idx_certificate_baptisms_deleted_at ON certificate_baptisms (deleted_at);
+
+CREATE TABLE IF NOT EXISTS certificate_requests (
+    id            BIGSERIAL PRIMARY KEY,
+    sacr_type     SMALLINT NOT NULL DEFAULT 0,
+    purpose       SMALLINT NOT NULL DEFAULT 0,
+    external      BOOLEAN NOT NULL DEFAULT false,
+    names         TEXT NOT NULL,
+    surnames      TEXT NOT NULL,
+    rut           TEXT NOT NULL,
+    date_birth    TIMESTAMPTZ,
+    mail          TEXT NOT NULL,
+    phone         TEXT NOT NULL,
+    org_unknown   BOOLEAN NOT NULL DEFAULT false,
+    org_id        BIGINT,
+    org_details   TEXT NOT NULL,
+    date_unknown  BOOLEAN NOT NULL DEFAULT false,
+    date_event    TIMESTAMPTZ,
+    date_from     TIMESTAMPTZ,
+    date_to       TIMESTAMPTZ,
+    created_at    TIMESTAMPTZ,
+    updated_at    TIMESTAMPTZ,
+    deleted_at    TIMESTAMPTZ,
+
+    CONSTRAINT chk_sacr_type CHECK (sacr_type BETWEEN 0 AND 255),
+    CONSTRAINT chk_purpose   CHECK (purpose BETWEEN 0 AND 255)
+    );
+
+CREATE INDEX IF NOT EXISTS idx_certificate_requests_deleted_at ON certificate_requests (deleted_at);

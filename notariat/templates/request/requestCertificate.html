@@ -1,0 +1,598 @@
+<!-- Title and Actions -->
+<div class="flex items-center mb-3 md:mb-0">
+    <!--<div class="flex-none">
+        <button hx-get="/index" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+            type="submit" class="bg-gray-500 hover:bg-gray-400 py-2 px-4 mx-2 border-b-4 border-gray-700 hover:border-gray-500 rounded text-sm text-white font-bold ">
+            Volver </button>
+    </div>-->
+    <div class="flex-auto pb-2">
+        <h1 class="text-2xl font-bold text-gray-700 text-center"> Formulario para Solicitud de Certificado </h1>
+    </div>
+    <div class="flex-none">
+        <!--<button type="submit" disabled
+            class="bg-gray-200 hover:bg-gray-100 py-2 px-4 mx-2 border-b-4 border-gray-300 hover:border-gray-200 rounded text-sm text-white font-bold disabled:pointer-events-none cursor-not-allowed">
+            Descartar </button>-->
+    </div>
+</div>
+<!-- @submit.prevent="enter"-->
+<form hx-post="/requestCertificate" hx-target="#content-div" hx-trigger="submit" hx-swap="innerHTML">
+<div class="border-2 border-gray-200 py-6 px-8 my-3">
+<!-- Certificate Details -->
+<div class="flex flex-wrap -mx-3 mb-6">
+    <!-- Sacrament -->
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <label for="sacr_type"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Sacramento </label>
+        <select id="sacr_type" name="sacr_types"
+            class="block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            <option disabled selected value> — Seleccione el sacramento de su certificado — </option>
+            {{range $key, $value := .sacrTypes}}
+            <option value={{$key}}
+                  class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">{{$value}}</option>
+            {{end}}
+        </select>
+    </div>
+    <!-- Purpose -->
+    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+        <label for="cert_purpose"
+            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Motivo </label>
+        <select id="cert_purpose" name="cert_purpose"
+            class="block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            <option disabled selected value> — Seleccione el motivo de su certificado — </option>
+            {{range $key, $value := .certTypes}}
+            <option value={{$key}}
+                  class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">{{$value}}</option>
+            {{end}}
+        </select>
+    </div>
+</div>
+<!-- Personal Information -->
+<label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-3"> Información Personal </label>
+<div class="border-dashed rounded border-2 border-gray-300 py-4 px-5 mb-6">
+    <!-- External  -->
+    <div class="flex flex-wrap mb-4">
+        <label class="relative flex justify-between items-center group text-sm italic text-gray-700">
+            Solicitar certificado por otra persona
+            <input id="ext_req" name="ext_req" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+            <span class="w-10 h-6 flex items-center flex-shrink-0 ml-3 p-1 bg-gray-300 rounded-full duration-300 ease-in-out peer-checked:bg-green-400 after:w-4 after:h-4 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-4"></span>
+        </label>
+    </div>
+    <!-- Names, Surnames and RUT -->
+    <div class="flex flex-wrap -mx-3 mb-3">
+        <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+            <label for="names"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Nombre/s </label>
+            <input id="names" name="names" type="text" placeholder="Ej: Pedro Ignacio"
+                class="w-full p-3 bg-white rounded focus:outline-none border border-gray-300 focus:border-gray-400 text-gray-700 transition ease-in-out duration-200">
+        </div>
+        <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+            <label for="surnames"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Apellido/s </label>
+            <input id="surnames" name="surnames" type="text" placeholder="Ej: Gutiérrez Rojas"
+                class="w-full p-3 bg-white rounded focus:outline-none border border-gray-300 focus:border-gray-400 text-gray-700 transition ease-in-out duration-200">
+        </div>
+        <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+            <label for="rut"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> RUT</label>
+            <input id="rut" name="rut" type="text" placeholder="Ej: 10.293.403-5"
+                class="w-full p-3 bg-white rounded focus:outline-none border border-gray-300 focus:border-gray-400 text-gray-700 transition ease-in-out duration-200">
+        </div>
+    </div>
+    <!-- Date Birth, Mail and Phone -->
+    <div class="flex flex-wrap -mx-3">
+        <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+            <div x-data="dateAndYearInput(0)" class="antialiased sans-serif">
+                <label for="date_birth"
+                    class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Fecha de nacimiento</label>
+                <div class="relative">
+                    <!-- Display -->
+                    <input type="hidden" id="date_birth" name="date_birth" x-model="date_birth">
+                    <input type="text" readonly x-model="dateBirthDisplay" @click="closeChange" placeholder="Buscar..."
+                        class="w-full p-3 bg-white rounded border border-gray-200 text-gray-700 focus:outline-none focus:bg-white focus:border-gray-500 transition ease-in-out duration-200">
+                    <div class="absolute top-0 right-0 px-4 py-3">
+                        <svg class="h-6 w-6 text-gray-400"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <!-- Date -->
+                    <div x-show="open" x-transition @click.away="closeCalendar" class="w-full bg-white p-4 absolute right-0 rounded-lg shadow z-10">
+                        <!-- Buttons and Display -->
+                        <div class="flex justify-between items-center mb-3">
+                            <!-- Months -->
+                            <button type="button" @click="prevMonth"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                                <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+                            <span x-text="MONTHS[month]" class="md:w-1/3 font-bold text-gray-700 text-center"></span>
+                            <button type="button" @click="nextMonth"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                                <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                            <!-- Year -->
+                            <button type="button" @click="prevYear"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                                <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+                            <input x-model="year" class="md:w-1/3 text-gray-700 font-bold text-center"/>
+                            <button type="button" @click="nextYear"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                                <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>    
+                        <!-- Calendar -->
+                        <div class="flex flex-wrap mb-3 -mx-1">
+                            <template x-for="(day, index) in DAYS" :key="index">
+                                <div style="width: 14.26%" class="px-1">
+                                    <div x-text="day" class="text-gray-800 font-medium text-center text-xs"></div>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="flex flex-wrap -mx-1">
+                            <template x-for="blankday in blankdays">
+                                <div style="width: 14.28%" class="text-center border p-1 border-transparent text-sm"></div>
+                            </template>
+                            <template x-for="(date, dateIndex) in no_of_days" :key="dateIndex">
+                                <div style="width: 14.28%" class="p-1 mb-1">
+                                    <div @click="setDate(date)" x-text="date"
+                                        class="p-1 cursor-pointer text-center text-sm leading-none rounded-full leading-loose transition ease-in-out duration-100"
+                                        :class="{'bg-blue-500 text-white': isToday(date) == true, 'text-gray-700 hover:bg-blue-200': isToday(date) == false }"></div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+            <label for="mail"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Correo electrónico </label>
+            <input id="mail" name="mail" type="text" placeholder="Ej: solicitante@mail.com"
+                class="w-full p-3 bg-white rounded focus:outline-none border border-gray-300 focus:border-gray-400 text-gray-700 transition ease-in-out duration-200">
+        </div>
+        <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+            <label for="phone"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Teléfono </label>
+            <input id="phone" name="phone" type="phone" placeholder="Ej: +56 93473650"
+                class="w-full p-3 bg-white rounded focus:outline-none border border-gray-300 focus:border-gray-400 text-gray-700 transition ease-in-out duration-200">
+        </div>
+    </div>
+</div>
+<!-- Organization  -->
+<label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-3"> Lugar de realización del Sacramento</label>
+<div class="border-dashed rounded border-2 border-gray-300 py-4 px-5 mb-6">
+    <!-- Incomplete  -->
+    <div class="flex flex-wrap mb-4">
+        <label class="relative flex justify-between items-center group text-sm italic text-gray-700">
+            No tengo la información exacta de la organización
+            <input id="org_unknown" name="org_unknown" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+            <span class="w-10 h-6 flex items-center flex-shrink-0 ml-4 p-1 bg-gray-300 rounded-full duration-300 ease-in-out peer-checked:bg-green-400 after:w-4 after:h-4 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-4"></span>
+        </label>
+    </div>
+    <!-- Organization Event and Details-->
+    <div class="flex flex-wrap -mx-3">
+        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+            <label for="org_id"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Realizado en </label>
+            <select id="org_id" name="org_id"
+                class="block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                <option selected value> — Seleccione la organización — </option>
+                {{range .orgs}}
+                <option value='{{.ID}}'
+                    class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">{{.OrgType | parseOrgType}} - {{.Name}}</option>
+                {{end}}
+                <option value=0
+                    class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">Otro</option>
+            </select>
+        </div>
+        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+            <label for="org_details"
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Detalles adicionales </label>
+            <input id="org_details" name="org_details" type="text" placeholder="Ej: Nombre organización, contacto, ubicación, ..."
+                class="w-full p-3 bg-white rounded focus:outline-none border border-gray-300 focus:border-gray-400 text-gray-700 transition ease-in-out duration-200">
+        </div>
+    </div>
+</div>
+<!-- Date Event  -->
+<label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-3"> Fecha de realización del Sacramento </label>
+<div class="border-dashed rounded border-2 border-gray-300 py-4 px-5">
+    <!-- Unknown -->
+    <div class="flex flex-wrap mb-6 md:mb-0">
+        <label class="relative flex justify-between items-center group text-sm italic mb-4 text-gray-700">
+            No tengo la fecha exacta del evento
+            <input id="date_unknown" name="date_unknown" type="checkbox" class="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />
+            <span class="w-10 h-6 flex items-center flex-shrink-0 ml-4 p-1 bg-gray-300 rounded-full duration-300 ease-in-out peer-checked:bg-green-400 after:w-4 after:h-4 after:bg-white after:rounded-full after:shadow-md after:duration-300 peer-checked:after:translate-x-4"></span>
+        </label>
+    </div>
+    <!-- Exact Date Sacrament -->
+    <div class="flex flex-wrap -mx-3 mb-3">
+        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+            <div x-data="dateAndYearInput(1)" class="antialiased sans-serif">
+                <label for="date_event"
+                    class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Realizado el día </label>
+                <div class="relative">
+                    <!-- Display -->
+                    <input type="hidden" id="date_event" name="date_event" x-model="date_event">
+                    <input type="text" readonly x-model="dateEventDisplay" @click="closeChange" placeholder="Buscar..." 
+                    class="w-full p-3 bg-white rounded border border-gray-200  text-gray-700 focus:outline-none focus:border-gray-400 transition ease-in-out duration-200">
+                    <div class="absolute top-0 right-0 px-4 py-3">
+                        <svg class="h-6 w-6 text-gray-400"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <!-- Date -->
+                    <div x-show="open" x-transition @click.away="closeCalendar"
+                        class="w-full bg-white p-4 absolute right-0 rounded-lg shadow z-10">
+                        <!-- Buttons and Display -->
+                        <div class="flex justify-between items-center mb-3">
+                            <!-- Months -->
+                            <button type="button" @click="prevMonth"
+                                    class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                                <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+                            <span x-text="MONTHS[month]" class="md:w-1/3 font-bold text-gray-700 text-center"></span>
+                            <button type="button" @click="nextMonth"
+                                class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                                <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                            <!-- Year -->
+                            <button type="button" @click="prevYear"
+                                    class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                                <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+                            <input x-model="year" class="md:w-1/3 text-gray-700 font-bold text-center"/>
+                            <button type="button" @click="nextYear"
+                                    class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                                <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <!-- Calendar -->
+                        <div class="flex flex-wrap mb-3 -mx-1">
+                            <template x-for="(day, index) in DAYS" :key="index">
+                                <div style="width: 14.26%" class="px-1">
+                                    <div x-text="day" class="text-gray-800 font-medium text-center text-xs"></div>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="flex flex-wrap -mx-1">
+                            <template x-for="blankday in blankdays">
+                                <div style="width: 14.28%" class="text-center border p-1 border-transparent text-sm"></div>
+                            </template>
+                            <template x-for="(date, dateIndex) in no_of_days" :key="dateIndex">
+                                <div style="width: 14.28%" class="p-1 mb-1">
+                                    <div @click="setDate(date)" x-text="date"
+                                        class="p-1 cursor-pointer text-center text-sm leading-none rounded-full leading-loose transition ease-in-out duration-100"
+                                        :class="{'bg-blue-500 text-white': isToday(date) == true, 'text-gray-700 hover:bg-blue-200': isToday(date) == false }"></div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Approximate Start Year and End Year  -->
+    <!--<div class="flex flex-wrap -mx-3 mb-6 md:mb-0">
+        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+            <div x-data="calendarInput(0)" class="relative antialiased sans-serif">
+                <label for="date_from"
+                        class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Desde </label>
+                <div class="relative">
+                    <input type="text" id="date_from" name="date_from" x-model="date_from" @click="closeChange" placeholder="Ej: 1900"
+                            class="block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                    <div class="absolute top-0 right-0 px-4 py-2">
+                        <svg class="h-8 w-6 text-gray-400"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <div x-show="open" x-transition @click.away="closeCalendar"
+                        class="w-full bg-white p-4 absolute shadow z-10">
+                        <div class="flex justify-between items-center">
+                            <button type="button" @click="prevYear"
+                                    class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                                <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+                            <div>
+                                <span x-text="year" class="text-base text-gray-600 font-bold"></span>
+                            </div>
+                            <button type="button" @click="nextYear"
+                                    class="w-transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                                <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+            <div x-data="calendarInput(1)" class="relative antialiased sans-serif">
+                <label for="date_to"
+                        class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Hasta </label>
+                <div class="relative">
+                    <input type="text" id="date_to" name="date_to" x-model="date_to" @click="closeChange" placeholder="Ej: 1900"
+                            class="block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+                    <div class="absolute top-0 right-0 px-4 py-2">
+                        <svg class="h-8 w-6 text-gray-400"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <div x-show="open" x-transition @click.away="closeCalendar"
+                            class="bg-white p-4 absolute shadow z-10">
+                        <div class="flex justify-between items-center">
+                            <button type="button" @click="prevYear"
+                                    class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                                <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+                            <div>
+                                <span x-text="year" class="text-base text-gray-600 font-bold"></span>
+                            </div>
+                            <button type="button" @click="nextYear"
+                                    class="transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+                                <svg class="h-4 w-4 text-gray-500 inline-flex"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>-->
+    </div>
+</div>
+</div>
+<!-- Buttons -->
+<div class="container flex justify-center mt-6">
+    <div class="flex flex-row mx-auto">
+        <button hx-get="/requestCertificate" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+            class="bg-red-400 hover:bg-red-300 py-2 px-4 mx-2 border-b-4 border-red-600 hover:border-red-400 rounded text-white font-bold">
+            Descartar </button>
+        <button type="submit" 
+                class="bg-green-500 hover:bg-green-400 py-2 px-4 mx-2 border-b-4 border-green-600 hover:border-green-400 rounded text-white font-bold">
+            Solicitar </button>
+    </div>
+</div>
+</form>
+<script>
+function dateAndYearInput(n) {
+    return {
+        // Variables
+        open: false,
+        no_of_days: [],
+        blankdays: [],
+        // General
+        init() {
+            let today = new Date();
+            this.date = today.getDate();
+            this.dateSel = this.date;
+            this.month = today.getMonth();
+            this.monthSel = this.month;
+            this.year = today.getFullYear();
+            this.yearSel = this.year;
+            if (n === 0) {
+                this.date_birth = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateBirthDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+            if (n === 1) {
+                this.date_event = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateEventDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+            this.getDays();
+        },
+        getDays() {
+            let dayOfWeek = new Date(this.year, this.month).getDay();
+            let blankdaysArray = [];
+            for (var i = 1; i <= dayOfWeek; i++) {
+                blankdaysArray.push(i);
+            }
+            this.blankdays = blankdaysArray;
+            let daysInMonth = new Date(this.year, this.month + 1, 0).getDate();
+            let daysArray = [];
+            for (var i = 1; i <= daysInMonth; i++) {
+                daysArray.push(i);
+            }
+            this.no_of_days = daysArray;
+        },
+        // Calendar
+        closeChange() {
+            this.open = !this.open;
+            if (this.open == true) {
+                this.openCalendar();
+            }
+        },
+        saveData() {
+            if (n == 0) {
+                this.date_birth = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateBirthDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+            if (n === 1) {
+                this.date_event = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateEventDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+        },
+        openCalendar() {
+            if (this.yearSel != "") {
+                this.month = this.monthSel;
+                this.year = this.yearSel;
+            }
+            this.getDays();
+        },
+        closeCalendar() {
+            this.open = false;
+        },
+        isToday(date) {
+            const currentDate = new Date(this.year, this.month, date);
+            const selectedDate = new Date(this.yearSel, this.monthSel, this.dateSel);
+            return selectedDate.toDateString() === currentDate.toDateString();
+        },
+        setDate(date) {
+            this.dateSel = date;
+            this.monthSel = this.month;
+            this.yearSel = this.year;
+            if (n === 0) {
+                this.date_birth = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateBirthDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+            if (n === 1) {
+                this.date_event = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateEventDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+            this.closeCalendar();
+        },
+        // Buttons
+        prevMonth() {
+            if (this.month === 0) {
+                this.month = 11;
+                this.year--;
+            }
+            else
+                this.month--;
+            this.getDays();
+        },
+        nextMonth() {
+            if (this.month === 11) {
+                this.month = 0;
+                this.year++;
+            }
+            else
+                this.month++;
+            this.getDays();
+        },
+        prevYear() {
+            this.year--;
+            this.getDays();
+        },
+        nextYear() {
+            this.year++;
+            this.getDays();
+        }
+    }
+}
+function calendarInput(n) {
+    return {
+        // Variables
+        open: false,
+        //no_of_days: [],
+        //blankdays: [],
+        // General
+        init() {
+            let today = new Date();
+            //this.date = today.getDate();
+            //this.dateSel = this.date;
+            //this.month = today.getMonth();
+            //this.monthSel = this.month;
+            this.year = today.getFullYear();
+            //this.yearSel = this.year;
+            this.date_from = "";
+            //this.dateFromDisplay = "";
+            this.date_to = this.year;
+            //this.dateToDisplay = this.year;
+        },
+        closeChange() {
+            this.open = !this.open;
+            if (this.open == true) {
+                this.openCalendar();
+            }
+        },
+        openCalendar() {
+            if (n == 0 && this.date_from != "") {
+                this.year = this.date_from;
+            } 
+            else if (n == 1 && this.date_to != "") {
+                this.year = this.date_to;
+            }
+        },
+        closeCalendar() {
+            this.open = false;
+            /*this.date = this.dateSel;
+            this.month = this.monthSel;
+            this.year = this.yearSel;*/
+        },
+        saveData() {
+            if (n == 0) {
+                this.date_from = this.year;
+            } 
+            else if (n == 1) {
+                this.date_to = this.year;
+            }
+        },
+        // calendar_type = 0: Date calendar with days and months (Birth, Expiring, Emission)
+        /*getDays() {
+            let dayOfWeek = new Date(this.year, this.month).getDay();
+            let blankdaysArray = [];
+            for (var i = 1; i <= dayOfWeek; i++) {
+                blankdaysArray.push(i);
+            }
+            this.blankdays = blankdaysArray;
+            let daysInMonth = new Date(this.year, this.month + 1, 0).getDate();
+            let daysArray = [];
+            for (var i = 1; i <= daysInMonth; i++) {
+                daysArray.push(i);
+            }
+            this.no_of_days = daysArray;},
+        prevMonth() {
+            if (this.month === 0) {
+                this.month = 11;
+                this.year--;
+            }
+            else
+                this.month--;
+            this.getDays();},
+        nextMonth() {
+            if (this.month === 11) {
+                this.month = 0;
+                this.year++;
+            }
+            else
+                this.month++;
+            this.getDays();},
+        isToday(date) {
+            const currentDate = new Date(this.year, this.month, date);
+            const selectedDate = new Date(this.yearSel, this.monthSel, this.dateSel);
+            return selectedDate.toDateString() === currentDate.toDateString();},
+        setDate(date) {
+            this.dateSel = date;
+            this.monthSel = this.month;
+            this.yearSel = this.year;
+            if (n === 0) {
+                this.date_from = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateFromDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+            else if (n === 1) {
+                this.date_to = this.yearSel + "-" + ('0' + (this.monthSel + 1)).slice(-2) + "-" + ('0' + this.dateSel).slice(-2);
+                this.dateToDisplay = this.dateSel + " " + MONTHS[this.monthSel] + " " + this.yearSel;
+            }
+            this.open = false;},*/
+        // calendar_type = 1: Year calendar (Search)
+        prevYear() {            
+            this.year--;
+            this.saveData();
+            //this.yearSel = this.year;
+        },
+        nextYear() {
+            this.year++;
+            this.saveData();
+        }
+    }
+}
+</script>

@@ -277,3 +277,32 @@ func getCertificatesBaptismFromOrgAndReg(db *gorm.DB, orgID uint, regID uint) []
 	log.Printf("N° certificates from register %d emitted by organization %d in database: %d", regID, orgID, result.RowsAffected)
 	return certificates
 }
+
+func createCertificateRequest(db *gorm.DB, certReq CertificateRequest) uint {
+	result := db.Create(&certReq)
+	if result.Error != nil {
+		log.Printf("Error inserting certificate request: %s", result.Error)
+	}
+	log.Printf("N° rows inserted: %d", result.RowsAffected)
+	return certReq.ID
+}
+func getCertificateRequestsFromMail(db *gorm.DB, mail string) []CertificateRequest {
+	var requests []CertificateRequest
+	result := db.Preload("Organization").Where("mail = ?", mail).Find(&requests)
+	if result.Error != nil {
+		log.Printf("Error obtaining certificate requests from mail: %s", result.Error)
+		return nil
+	}
+	log.Printf("N° certificate requests with mail %s in database: %d", mail, result.RowsAffected)
+	return requests
+}
+func getCertificateRequestsFromOrg(db *gorm.DB, orgID uint) []CertificateRequest {
+	var requests []CertificateRequest
+	result := db.Preload("Organization").Find(&requests, CertificateRequest{OrgID: orgID})
+	if result.Error != nil {
+		log.Printf("Error obtaining certificate requests from org: %s", result.Error)
+		return nil
+	}
+	log.Printf("N° certificate requests from organization %d in database: %d", orgID, result.RowsAffected)
+	return requests
+}

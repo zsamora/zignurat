@@ -96,6 +96,27 @@ type CertificateBaptism struct {
 	UUID           uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();<-:create"`
 }
 
+type CertificateRequest struct {
+	gorm.Model
+	SacrType     uint8
+	Purpose      uint8
+	External     bool
+	Names        string
+	Surnames     string
+	RUT          string
+	DateBirth    time.Time
+	Mail         string
+	Phone        string
+	OrgUnknown   bool
+	OrgID        uint
+	Organization Organization `gorm:"foreignKey:OrgID"`
+	OrgDetails   string
+	DateUnknown  bool
+	DateEvent    time.Time
+	DateFrom     time.Time
+	DateTo       time.Time
+}
+
 type CertificateBaptismPDF struct {
 	CertID             string
 	CertUUID           string
