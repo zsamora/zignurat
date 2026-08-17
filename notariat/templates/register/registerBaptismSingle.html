@@ -1,6 +1,6 @@
 <div class="flex items-center mb-6 md:mb-0">
     <div class="flex-none">
-        <button hx-get="/getBookRegisters?book_id={{.BookBap.ID}}" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+        <button hx-get="/org/getBookRegisters?book_id={{.BookBap.ID}}" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
             type="submit" class="bg-gray-500 hover:bg-gray-400 py-2 px-4 mx-2 border-b-4 border-gray-700 hover:border-gray-500 rounded text-sm text-white font-bold ">
             Volver </button>
     </div>
@@ -163,13 +163,13 @@
 <!-- Button -->
 <div class="container flex justify-center mt-6">
     <div class="flex flex-row mx-auto">
-        <form hx-post="/getCertificatesFromReg" hx-target="#content-div" hx-trigger="submit" hx-swap="innerHTML">
+        <form hx-post="/org/getCertificatesFromReg" hx-target="#content-div" hx-trigger="submit" hx-swap="innerHTML">
         <input type="hidden" id="reg_id" name="reg_id" value='{{.RegBap.ID}}' readonly="readonly">
         <button type="submit"
             class="bg-blue-400 hover:bg-blue-300 py-2 px-4 mx-2 border-b-4 border-blue-600 hover:border-blue-400 rounded text-white font-bold">
             Ver Certificados </button>
     </form>
-    <form hx-post="/createCertificate" hx-target="#content-div" hx-trigger="submit" hx-swap="innerHTML">
+    <form hx-post="/org/createCertificate" hx-target="#content-div" hx-trigger="submit" hx-swap="innerHTML">
         <input type="hidden" id="reg_id" name="reg_id" value='{{.RegBap.ID}}' readonly="readonly">
         <button type="submit"
             class="bg-green-500 hover:bg-green-400 py-2 px-4 mx-2 border-b-4 border-green-600 hover:border-green-400 rounded text-white font-bold">

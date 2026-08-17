@@ -1,6 +1,6 @@
 <h1 class="text-2xl text-gray-700 font-bold text-center">Crear nuevo miembro</h1>
 <p class="font-normal text-m text-gray-400 md:px-2 py-2 text-center">Ingrese la información requerida</p>
-<form hx-post="/createMember" hx-target="#content-div" hx-swap="innerHTML" class="mt-8 space-y-4">
+<form hx-post="{{.submitPath}}" hx-target="#content-div" hx-swap="innerHTML" class="mt-8 space-y-4">
     <!-- Names and Surnames -->
     <div class="flex flex-wrap -mx-3 mb-3">
         <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">

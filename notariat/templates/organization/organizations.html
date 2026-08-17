@@ -8,7 +8,7 @@
         <h1 class="text-2xl font-bold text-gray-700 text-center">Organizaciones</h1>
     </div>
     <div class="flex-1">
-        <button hx-get="/createOrg" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+        <button hx-get="/admin/createOrg" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
                 class="float-right bg-green-500 hover:bg-green-400 py-2 px-4 mx-2 border-b-4 border-green-600 hover:border-green-400 rounded text-sm text-white font-bold">
             Nueva Organización </button>
     </div>
@@ -91,7 +91,7 @@
                     <p class="text-sm text-slate-500">{{.Address}}</p>
                 </td>
                 <td class="p-4 border-b border-slate-200 py-5">
-                    <form hx-post="/getOrgBooks" hx-target="#content-div" hx-swap="innerHTML">
+                    <form hx-post="/org/getOrgBooks" hx-target="#content-div" hx-swap="innerHTML">
                         <input type="hidden" id="org_id" name="org_id" value="{{.ID}}">
                         <input type="hidden" id="org_type" name="org_type" value="{{.OrgType}}">
                         <input type="hidden" id="org_name" name="org_name" value="{{.Name}}">

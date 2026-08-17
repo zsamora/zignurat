@@ -119,11 +119,61 @@ func ownersForAccount(module uint8, accRole uint8) []ownerOption {
 	}
 }
 
+type accountRow struct {
+	Account
+	Owners       []ownerOption
+	OwnerUUIDStr string
+	ModuleName   string
+	RoleName     string
+}
+
+func roleNameFor(module uint8, accRole uint8) string {
+	switch module {
+	case 1:
+		return identiratRoles[accRole]
+	case 2:
+		return notariatRoles[accRole]
+	default:
+		return ""
+	}
+}
+
+func buildAccountRows(accounts []Account) []accountRow {
+	type roleKey struct {
+		module  uint8
+		accRole uint8
+	}
+	ownersByRole := make(map[roleKey][]ownerOption)
+	rows := make([]accountRow, 0, len(accounts))
+	for _, account := range accounts {
+		key := roleKey{account.Module, account.AccRole}
+		owners, cached := ownersByRole[key]
+		if !cached {
+			owners = ownersForAccount(account.Module, account.AccRole)
+			ownersByRole[key] = owners
+		}
+		ownerUUIDStr := ""
+		if account.OwnerUUID != nil {
+			ownerUUIDStr = account.OwnerUUID.String()
+		}
+		rows = append(rows, accountRow{
+			Account:      account,
+			Owners:       owners,
+			ModuleName:   modules[account.Module],
+			RoleName:     roleNameFor(account.Module, account.AccRole),
+			OwnerUUIDStr: ownerUUIDStr,
+		})
+	}
+	return rows
+}
+
 func ownersForNotariatRole(accRole uint8) []ownerOption {
 	switch accRole {
 	case 2:
 		return fetchNotariatOwners("organizations")
 	case 3:
+		return fetchNotariatOwners("members")
+	case 4:
 		return fetchNotariatOwners("users")
 	default:
 		return nil

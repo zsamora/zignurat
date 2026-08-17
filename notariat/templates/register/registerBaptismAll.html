@@ -1,6 +1,6 @@
 <div class="flex items-center mb-6 md:mb-0">
     <div class="flex-none">
-        <button hx-get="/getOrgBooks?org_id={{.OrgID}}" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+        <button hx-get="/org/getOrgBooks?org_id={{.OrgID}}" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
             type="submit" class="bg-gray-500 hover:bg-gray-400 py-2 px-4 mx-2 border-b-4 border-gray-700 hover:border-gray-500 rounded text-sm text-white font-bold ">
             Volver </button>
     </div>
@@ -10,7 +10,7 @@
         <h1 class="text-2xl font-bold text-gray-700 text-center">Libro N° {{.Book.BookNr}} <span class="text-base text-gray-500 text-center">({{$yearInitial}}{{if ne $yearInitial $yearFinal}} - {{$yearFinal}}{{end}})</span></h3>
     </div>
     <div class="flex-none">
-        <form hx-post="/createRegisterBaptism" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML">
+        <form hx-post="/org/createRegisterBaptism" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML">
             <input type="hidden" id="org_id" name="org_id" value='{{.OrgID}}' readonly="readonly">
             <input type="hidden" id="book_id" name="book_id" value='{{.Book.ID}}' readonly="readonly">
             <button type="submit"
@@ -84,7 +84,7 @@
                     <p class="text-sm text-slate-500">{{.RUT}}</p>
                 </td>
                 <td class="p-4 border-b border-slate-200 py-5">
-                    <form hx-post="/getRegisterBaptism" hx-target="#content-div" hx-trigger="submit" hx-swap="innerHTML">
+                    <form hx-post="/org/getRegisterBaptism" hx-target="#content-div" hx-trigger="submit" hx-swap="innerHTML">
                         <input type="hidden" id="reg_id" name="reg_id" value='{{.ID}}' readonly="readonly">
                         <button type="submit"
                             class="bg-blue-400 hover:bg-blue-300 py-2 px-4 mx-2 border-b-4 border-blue-600 hover:border-blue-400 rounded text-sm text-white font-bold">

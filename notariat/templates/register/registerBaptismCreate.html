@@ -13,7 +13,7 @@
     <div class="flex-none">
     </div>
 </div>
-<form hx-post="/addRegisterBaptism" hx-target="#content-div" hx-trigger="submit" hx-swap="innerHTML">
+<form hx-post="/org/addRegisterBaptism" hx-target="#content-div" hx-trigger="submit" hx-swap="innerHTML">
 <div class="border-2 border-gray-200 p-8 my-6">
 <!-- Book Info -->
 <div class="flex flex-wrap -mx-3 mb-3">
@@ -329,7 +329,7 @@
 <!-- Button -->
 <div class="container flex justify-center mt-6">
     <div class="flex flex-row mx-auto">
-        <button hx-get="/getBookRegisters/?book_id={{.Book.ID}}" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+        <button hx-get="/org/getBookRegisters/?book_id={{.Book.ID}}" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
             class="bg-red-400 hover:bg-red-300 py-2 px-4 mx-2 border-b-4 border-red-600 hover:border-red-400 rounded text-white font-bold">
             Descartar </button>
         <button type="submit"

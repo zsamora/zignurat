@@ -2,6 +2,8 @@ package utils
 
 import (
 	"log"
+	"net/http"
+	"slices"
 	"time"
 
 	"github.com/gin-contrib/sessions"
@@ -26,37 +28,73 @@ type JWTResponse struct {
 	Error   string
 }
 
+func setAuthContext(c *gin.Context, moduleOrigin uint8) bool {
+	jwtToken := GetJWTTokenFromSession(c)
+	if jwtToken != "" {
+		claims, err := CheckJWTToken(jwtToken, c)
+		if err == nil {
+			if claims.Module == moduleOrigin {
+				log.Printf("- Logged in (ID: %d, Name: %s, Module: %d, Role: %d, Owner UUID: %v, Exp. Time: %s)",
+					claims.ID, claims.Name, claims.Module, claims.AccRole, claims.OwnerUUID, claims.RegisteredClaims.ExpiresAt)
+				c.Set("LoggedIn", true)
+				c.Set("ID", claims.ID)
+				c.Set("Name", claims.Name)
+				c.Set("Module", claims.Module)
+				c.Set("Role", claims.AccRole)
+				c.Set("OwnerUUID", claims.OwnerUUID)
+				c.Set("ExpiresAt", claims.RegisteredClaims.ExpiresAt)
+				return true
+			}
+			log.Printf("!! JWT Token is for a different module")
+		}
+	}
+	SetJWTTokenFromSession(c, nil, nil)
+	c.Set("LoggedIn", false)
+	c.Set("ID", nil)
+	c.Set("Name", nil)
+	c.Set("Module", nil)
+	c.Set("Role", nil)
+	c.Set("OwnerUUID", nil)
+	return false
+}
+
 func AuthMiddleware(moduleOrigin uint8) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		jwtToken := GetJWTTokenFromSession(c)
-		if jwtToken != "" {
-			claims, err := CheckJWTToken(jwtToken, c)
-			if err == nil {
-				module := claims.Module
-				if module == moduleOrigin {
-					log.Printf("- Logged in (ID: %d, Name: %s, Module: %d, Role: %d, Owner UUID: %v, Exp. Time: %s)",
-						claims.ID, claims.Name, claims.Module, claims.AccRole, claims.OwnerUUID, claims.RegisteredClaims.ExpiresAt)
-					c.Set("LoggedIn", true)
-					c.Set("ID", claims.ID)
-					c.Set("Name", claims.Name)
-					c.Set("Module", claims.Module)
-					c.Set("Role", claims.AccRole)
-					c.Set("OwnerUUID", claims.OwnerUUID)
-					c.Set("ExpiresAt", claims.RegisteredClaims.ExpiresAt)
-					c.Next()
-					return
-				} else {
-					log.Printf("!! JWT Token is for a different module")
-				}
-			}
+		setAuthContext(c, moduleOrigin)
+		c.Next()
+	}
+}
+
+func RequireAuthMiddleware(moduleOrigin uint8) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if !setAuthContext(c, moduleOrigin) {
+			c.Redirect(http.StatusFound, "/loginForm")
+			c.Abort()
+			return
 		}
-		SetJWTTokenFromSession(c, nil, nil)
-		c.Set("LoggedIn", false)
-		c.Set("ID", nil)
-		c.Set("Name", nil)
-		c.Set("Module", nil)
-		c.Set("Role", nil)
-		c.Set("OwnerUUID", nil)
+		c.Next()
+	}
+}
+
+// RequireRoleMiddleware behaves like RequireAuthMiddleware, but additionally
+// checks the token's AccRole against allowedRoles. An unauthenticated request
+// is redirected to /loginForm same as RequireAuthMiddleware; an authenticated
+// request with the wrong role is redirected to / instead, since the account
+// is real and simply belongs on a different page, not the login form.
+func RequireRoleMiddleware(moduleOrigin uint8, allowedRoles ...uint8) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if !setAuthContext(c, moduleOrigin) {
+			c.Redirect(http.StatusFound, "/loginForm")
+			c.Abort()
+			return
+		}
+		role, _ := c.Get("Role")
+		accRole, ok := role.(uint8)
+		if !ok || !slices.Contains(allowedRoles, accRole) {
+			c.Redirect(http.StatusFound, "/")
+			c.Abort()
+			return
+		}
 		c.Next()
 	}
 }

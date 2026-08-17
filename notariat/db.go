@@ -46,6 +46,16 @@ func GetOrganizationFromUUID(db *gorm.DB, orgUUID uuid.UUID) Organization {
 	log.Printf("N° organizations in database with UUID %s: %d", orgUUID, result.RowsAffected)
 	return org
 }
+func GetMemberFromUUID(db *gorm.DB, memberUUID uuid.UUID) Member {
+	var member Member
+	result := db.Where("uuid = ?", memberUUID).First(&member)
+	if result.Error != nil {
+		log.Printf("Error retrieving member by UUID %s: %s", memberUUID, result.Error)
+		return member
+	}
+	log.Printf("N° members in database with UUID %s: %d", memberUUID, result.RowsAffected)
+	return member
+}
 func GetOrganizations(db *gorm.DB) []Organization {
 	var orgs []Organization
 	result := db.Find(&orgs)

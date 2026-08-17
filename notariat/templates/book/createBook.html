@@ -16,7 +16,7 @@
         </form>-->
     </div>
 </div>
-<form hx-post="/addBook" hx-target="#content-div" hx-trigger="submit" hx-swap="innerHTML" class="mt-8 space-y-4">
+<form hx-post="/org/addBook" hx-target="#content-div" hx-trigger="submit" hx-swap="innerHTML" class="mt-8 space-y-4">
 <div class="my-6">
 <!-- Organization and Book Number -->
 <div class="flex flex-wrap -mx-3 mb-3">
@@ -212,7 +212,7 @@
 </div>
 <div class="container flex justify-center mx-auto">
   <div class="flex flex-row mx-auto mt-6">
-    <button hx-get="/getOrgBooks" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+    <button hx-get="/org/getOrgBooks" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
             class="bg-red-400 hover:bg-red-300 py-2 px-4 mx-2 border-b-4 border-red-600 hover:border-red-400 rounded text-white font-bold">
         Descartar </button>
     <button type="submit"

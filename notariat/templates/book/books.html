@@ -1,6 +1,6 @@
 <div class="flex items-center mb-6">
     <div class="flex-1">
-        <button hx-get="/admin/organizations" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+        <button hx-get="/home" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
             type="submit" class="bg-gray-500 hover:bg-gray-400 py-2 px-4 mx-2 border-b-4 border-gray-700 hover:border-gray-500 rounded text-sm text-white font-bold ">
             Volver </button>
     </div>
@@ -8,7 +8,7 @@
         <h1 class="text-2xl font-bold text-gray-700 text-center pb-2"> Libros </h1>
     </div>
     <div class="flex-1">
-        <form hx-post="/createBook" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML">
+        <form hx-post="/org/createBook" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML">
             <input type="hidden" id="org_id" name="org_id" value='{{.OrgID}}' readonly="readonly">
             <button type="submit"
                     class="float-right bg-green-500 hover:bg-green-400 py-2 px-4 mx-2 border-b-4 border-green-600 hover:border-green-400 rounded text-sm text-white font-bold">
@@ -76,7 +76,7 @@
                     <p class="text-sm text-slate-500">{{.DateFinal | parseDate}}</p>
                 </td>
                 <td class="p-4 border-b border-slate-200 py-5">
-                    <form hx-post="/getBookRegisters" hx-target="#content-div" hx-swap="innerHTML">
+                    <form hx-post="/org/getBookRegisters" hx-target="#content-div" hx-swap="innerHTML">
                         <input type="hidden" id="book_id" name="book_id" value="{{.ID}}">
                         <button type="submit"
                                 class="bg-blue-400 hover:bg-blue-300 py-2 px-4 mx-2 border-b-4 border-blue-600 hover:border-blue-400 rounded text-sm text-white font-bold ">

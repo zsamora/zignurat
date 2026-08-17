@@ -1,6 +1,6 @@
 <div class="flex items-center mb-6">
     <div class="flex-1">
-        <button hx-get="{{if .RegID}}/getRegisterBaptism?reg_id={{.RegID}}{{else}}/getOrgBooks{{end}}" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+        <button hx-get="{{if .RegID}}/org/getRegisterBaptism?reg_id={{.RegID}}{{else}}/org/getOrgBooks{{end}}" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
             type="submit" class="bg-gray-500 hover:bg-gray-400 py-2 px-4 mx-2 border-b-4 border-gray-700 hover:border-gray-500 rounded text-sm text-white font-bold ">
             Volver </button>
     </div>
@@ -48,7 +48,7 @@
                     <p class="text-sm text-slate-500 mb-2"><b>{{.Register.RegNumber}}:</b> {{.Register.BaptizedNameF}} {{.Register.FatherSurname}}</p>
                 </td>
                 <td class="p-4 border-b border-slate-200 py-5">
-                    <form hx-post="/getRegisterBaptism" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML">
+                    <form hx-post="/org/getRegisterBaptism" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML">
                         <input type="hidden" id="reg_id" name="reg_id" value='{{.RegID}}' readonly="readonly">
                         <button type="submit"
                                 class="bg-blue-400 hover:bg-blue-300 py-2 px-4 mx-2 border-b-4 border-blue-500 hover:border-blue-400 rounded text-sm text-white font-bold">
@@ -62,8 +62,8 @@
                     <p class="text-sm text-slate-500">{{.DateEmission | parseDate}} - {{.DateExpiration | parseDate}}</p>
                 </td>
                 <td class="p-4 border-b border-slate-200 py-5">
-                    <!-- hx-boost="true" action="/downloadPDFCertificateBaptism" method="post"> -->
-                    <form action="/downloadPDFCertificateBaptism" method="post">  <!--hx-post="/downloadPDFCertificateBaptism" hx-target="#content-div" hx-swap="innerHTML" -->
+                    <!-- hx-boost="true" action="/org/downloadPDFCertificateBaptism" method="post"> -->
+                    <form action="/org/downloadPDFCertificateBaptism" method="post">  <!--hx-post="/org/downloadPDFCertificateBaptism" hx-target="#content-div" hx-swap="innerHTML" -->
                         <input type="hidden" id="cert_id" name="cert_id" value="{{.ID}}">
                         <input type="hidden" id="cert_uuid" name="cert_uuid" value="{{.UUID}}">
                         <input type="hidden" id="org_emisor" name="org_emisor" value="{{.OrgEmisor}}">

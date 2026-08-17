@@ -25,7 +25,8 @@ var (
 	notariatRoles = map[uint8]string{
 		1: "Administrador",
 		2: "Organización",
-		3: "Usuario",
+		3: "Validador",
+		4: "Usuario",
 	}
 )
 
@@ -52,7 +53,6 @@ func AuthRoutes(router *gin.Engine, db *gorm.DB) {
 		admin.GET("/getAccRoles", CreateAccountGetAccountRoles())
 		admin.GET("/getOwners", CreateAccountGetOwners())
 		admin.POST("/createAccount", SaveAccount(db))
-		admin.POST("/updateSetOwner", UpdateAccountSetOwner(db))
 		admin.POST("/setOwner", SetOwner(db))
 		admin.POST("/changePassword", ChangePassword(db))
 	}
@@ -186,7 +186,7 @@ func Logout() gin.HandlerFunc {
 
 func Accounts(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		accounts := getAccounts(db)
+		accounts := buildAccountRows(getAccounts(db))
 		c.HTML(http.StatusOK, "accounts.html", gin.H{
 			"accounts": accounts,
 		})
@@ -257,7 +257,7 @@ func SaveAccount(db *gorm.DB) gin.HandlerFunc {
 			OwnerUUID: ownerUUID,
 		}
 		createAccount(db, account)
-		accounts := getAccounts(db)
+		accounts := buildAccountRows(getAccounts(db))
 		c.HTML(http.StatusOK, "accounts.html", gin.H{
 			"accounts": accounts,
 		})
@@ -272,25 +272,9 @@ func SetOwner(db *gorm.DB) gin.HandlerFunc {
 		ownerUUID := utils.ParseUUID(ownerUUIDRaw)
 		account.OwnerUUID = &ownerUUID
 		updateAccount(db, account)
-		accounts := getAccounts(db)
+		accounts := buildAccountRows(getAccounts(db))
 		c.HTML(http.StatusOK, "accounts.html", gin.H{
 			"accounts": accounts,
-		})
-	}
-}
-
-func UpdateAccountSetOwner(db *gorm.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		accIdInt, _ := utils.ParseInt(c.PostForm("acc_id"))
-		account := getAccountById(db, int64(accIdInt))
-		owners := ownersForAccount(account.Module, account.AccRole)
-
-		ownerUUID := c.PostForm("owner_uuid")
-		c.HTML(http.StatusOK, "setOwner.html", gin.H{
-			"AccountID": account.ID,
-			"Username":  account.Username,
-			"owners":    owners,
-			"OwnerUUID": ownerUUID,
 		})
 	}
 }
@@ -309,7 +293,7 @@ func ChangePassword(db *gorm.DB) gin.HandlerFunc {
 		}
 		account.Password = HashPassword(pw)
 		updateAccount(db, account)
-		accounts := getAccounts(db)
+		accounts := buildAccountRows(getAccounts(db))
 		c.HTML(http.StatusOK, "accounts.html", gin.H{
 			"accounts": accounts,
 		})

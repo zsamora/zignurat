@@ -1,11 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
-	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -18,16 +13,6 @@ import (
 )
 
 var (
-	adminNavbarItems = map[string]string{
-		"/admin/organizations": "Organizaciones",
-		"/admin/users":         "Usuarios",
-		"/admin/members":       "Miembros",
-	}
-	orgNavbarItems = map[string]string{
-		"/org/books":        "Registro",
-		"/org/certificates": "Verificación",
-		"/org/members":      "Miembros",
-	}
 	memberRoles = map[uint8]string{
 		0: "Administrador",
 		1: "Validador",
@@ -35,101 +20,81 @@ var (
 	}
 )
 
-func LandingRoutes(router *gin.Engine) {
-	router.GET("/", utils.AuthMiddleware(2), Home())
-	router.GET("/home", utils.AuthMiddleware(2), func(c *gin.Context) {
-		c.HTML(http.StatusOK, "help.html", gin.H{})
-	})
-	router.GET("/index", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "landing.html", gin.H{})
-	})
-}
-func LoginRoutes(router *gin.Engine) {
-	router.GET("/loginForm", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "login.html", gin.H{})
-	})
-	router.POST("/loginForm", LoginRequest())
-	router.GET("/logout", Logout())
-}
+// AccRole values for module 2 (Notariat), mirroring identirat's notariatRoles map.
+const (
+	accRoleAdministrador uint8 = 1
+	accRoleOrganizacion  uint8 = 2
+	accRoleValidador     uint8 = 3
+)
+
 func AdminRoutes(router *gin.Engine, db *gorm.DB) {
 	admin := router.Group("/admin")
-	admin.Use(utils.AuthMiddleware(2))
+	admin.Use(utils.RequireRoleMiddleware(2, accRoleAdministrador))
 	{
 		admin.GET("/organizations", Organizations(db))
 		admin.GET("/users", Users(db))
+		admin.GET("/createOrg", CreateOrgForm())
+		admin.POST("/createOrg", CreateOrg(db))
+		admin.GET("/createUser", CreateUserForm())
+		admin.POST("/createUser", CreateUser(db))
 	}
-	router.GET("/createOrg", CreateOrgForm())
-	router.POST("/createOrg", CreateOrg(db))
-	router.GET("/createUser", CreateUserForm())
-	router.POST("/createUser", CreateUser(db))
 }
 func MemberRoutes(router *gin.Engine, db *gorm.DB) {
 	admin := router.Group("/admin")
-	admin.Use(utils.AuthMiddleware(2))
+	admin.Use(utils.RequireRoleMiddleware(2, accRoleAdministrador))
 	{
 		admin.GET("/members", Members(db))
+		admin.GET("/createMember", CreateMemberForm(db))
+		admin.POST("/createMember", CreateMember(db))
 	}
-	router.GET("/createMember", CreateMemberForm(db))
-	router.POST("/createMember", CreateMember(db))
+	org := router.Group("/org")
+	org.Use(utils.RequireRoleMiddleware(2, accRoleOrganizacion, accRoleValidador))
+	{
+		org.GET("/members", OrgMembers(db))
+		org.GET("/createMember", CreateMemberForm(db))
+		org.POST("/createMember", CreateMember(db))
+	}
 }
 func OrgRoutes(router *gin.Engine, db *gorm.DB) {
 	org := router.Group("/org")
-	org.Use(utils.AuthMiddleware(2))
+	org.Use(utils.RequireRoleMiddleware(2, accRoleOrganizacion, accRoleValidador))
 	{
 		org.GET("/books", Books(db))
 		org.GET("/certificates", Certificates(db))
-		org.GET("/members", OrgMembers(db))
 	}
 }
 func BookRoutes(router *gin.Engine, db *gorm.DB) {
-	g := router.Group("")
-	g.Use(utils.AuthMiddleware(2))
-	g.POST("/createBook", CreateBookForm(db))
-	g.POST("/addBook", AddBook(db))
-	g.GET("/getOrgBooks", Books(db))
-	g.POST("/getOrgBooks", Books(db))
-}
-func RegisterRoutes(router *gin.Engine, db *gorm.DB) {
-	g := router.Group("")
-	g.Use(utils.AuthMiddleware(2))
-	g.GET("/getBookRegisters", GetBookRegisters(db))
-	g.POST("/getBookRegisters", GetBookRegisters(db))
-	g.POST("/createRegisterBaptism", CreateRegisterBaptismForm(db))
-	g.POST("/addRegisterBaptism", AddRegisterBaptism(db))
-	g.GET("/getRegisterBaptism", GetRegisterBaptism(db))
-	g.POST("/getRegisterBaptism", GetRegisterBaptism(db))
-}
-func CertificateRoutes(router *gin.Engine, db *gorm.DB) {
-	g := router.Group("")
-	g.Use(utils.AuthMiddleware(2))
-	g.POST("/getCertificatesFromReg", GetCertificatesFromReg(db))
-	g.POST("/createCertificate", CreateCertificateForm(db))
-	g.POST("/addCertificateBaptism", AddCertificateBaptism(db))
-	g.POST("/downloadPDFCertificateBaptism", DownloadPDFCertificateBaptism(db))
-}
-func InternalRoutes(router *gin.Engine, db *gorm.DB) {
-	router.GET("/internal/organizations", GetOrganizationsJSON(db))
-}
-
-type ownerSummary struct {
-	UUID        uuid.UUID `json:"uuid"`
-	DisplayName string    `json:"display_name"`
-}
-
-func GetOrganizationsJSON(db *gorm.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		orgs := GetOrganizations(db)
-		summaries := make([]ownerSummary, 0, len(orgs))
-		for _, org := range orgs {
-			summaries = append(summaries, ownerSummary{
-				UUID:        org.UUID,
-				DisplayName: ParseOrgType(org.OrgType) + " - " + org.Name,
-			})
-		}
-		c.JSON(http.StatusOK, summaries)
+	org := router.Group("/org")
+	org.Use(utils.RequireRoleMiddleware(2, accRoleOrganizacion, accRoleValidador))
+	{
+		org.POST("/createBook", CreateBookForm(db))
+		org.POST("/addBook", AddBook(db))
+		org.GET("/getOrgBooks", Books(db))
+		org.POST("/getOrgBooks", Books(db))
 	}
 }
-
+func RegisterRoutes(router *gin.Engine, db *gorm.DB) {
+	org := router.Group("/org")
+	org.Use(utils.RequireRoleMiddleware(2, accRoleOrganizacion, accRoleValidador))
+	{
+		org.GET("/getBookRegisters", GetBookRegisters(db))
+		org.POST("/getBookRegisters", GetBookRegisters(db))
+		org.POST("/createRegisterBaptism", CreateRegisterBaptismForm(db))
+		org.POST("/addRegisterBaptism", AddRegisterBaptism(db))
+		org.GET("/getRegisterBaptism", GetRegisterBaptism(db))
+		org.POST("/getRegisterBaptism", GetRegisterBaptism(db))
+	}
+}
+func CertificateRoutes(router *gin.Engine, db *gorm.DB) {
+	org := router.Group("/org")
+	org.Use(utils.RequireRoleMiddleware(2, accRoleOrganizacion, accRoleValidador))
+	{
+		org.POST("/getCertificatesFromReg", GetCertificatesFromReg(db))
+		org.POST("/createCertificate", CreateCertificateForm(db))
+		org.POST("/addCertificateBaptism", AddCertificateBaptism(db))
+		org.POST("/downloadPDFCertificateBaptism", DownloadPDFCertificateBaptism(db))
+	}
+}
 func currentOwnerUUID(c *gin.Context) *uuid.UUID {
 	if v, exists := c.Get("OwnerUUID"); exists && v != nil {
 		if ptr, ok := v.(*uuid.UUID); ok && ptr != nil {
@@ -138,12 +103,19 @@ func currentOwnerUUID(c *gin.Context) *uuid.UUID {
 	}
 	return nil
 }
+
+// currentOwnerOrgID resolves the logged-in account's organization, whether it
+// owns an Organization directly (Organización) or a Member that belongs to
+// one (Validador, Administrador member role, etc).
 func currentOwnerOrgID(db *gorm.DB, c *gin.Context) uint {
 	ownerUUID := currentOwnerUUID(c)
 	if ownerUUID == nil {
 		return 0
 	}
-	return GetOrganizationFromUUID(db, *ownerUUID).ID
+	if org := GetOrganizationFromUUID(db, *ownerUUID); org.ID != 0 {
+		return org.ID
+	}
+	return GetMemberFromUUID(db, *ownerUUID).OrgID
 }
 func parseOrgIDParam(db *gorm.DB, c *gin.Context) uint {
 	if idStr := c.PostForm("org_id"); idStr != "" {
@@ -156,103 +128,6 @@ func parseOrgIDParam(db *gorm.DB, c *gin.Context) uint {
 	}
 	return currentOwnerOrgID(db, c)
 }
-
-func Home() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		role := c.MustGet("Role")
-		name := c.MustGet("Name")
-		if role != nil && name != nil {
-			getRoleHome(c, role.(uint8), name.(string))
-		} else {
-			c.HTML(http.StatusUnauthorized, "index.html", gin.H{
-				"LoggedIn":    false,
-				"navbarItems": nil,
-				"Name":        nil,
-			})
-		}
-	}
-}
-
-type Login struct {
-	User     string `form:"user" json:"user" xml:"user" binding:"required"`
-	Password string `form:"password" json:"password" xml:"password" binding:"required"`
-}
-
-func LoginRequest() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		var form Login
-		if err := c.ShouldBind(&form); err != nil {
-			c.HTML(http.StatusOK, "index.html", gin.H{
-				"LoggedIn":    false,
-				"navbarItems": nil,
-				"Name":        nil,
-			})
-		} else {
-			identiratUrl := utils.GetConfig("IDENTIRAT_URL")
-			identiratPort := utils.GetConfig("IDENTIRAT_PORT")
-			identiratLogin := utils.GetConfig("IDENTIRAT_LOGIN")
-			requestURL := fmt.Sprintf("http://%s:%s/%s", identiratUrl, identiratPort, identiratLogin)
-			requestJSON := []byte(fmt.Sprintf(`{"user": "%s", "password": "%s"}`, form.User, form.Password))
-			bodyReader := bytes.NewReader(requestJSON)
-			req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
-			if err != nil {
-				log.Printf("# Notariat: Failed creating POST request: %s\n", err)
-			} else {
-				req.Header.Set("Content-Type", "application/json")
-				res, err := http.DefaultClient.Do(req)
-				if err != nil {
-					log.Printf("# Notariat: Failed executing POST request: %s\n", err)
-				} else {
-					defer res.Body.Close()
-					log.Printf("client: status code: %d\n", res.StatusCode)
-					if res.StatusCode == 200 {
-						resBody, err := io.ReadAll(res.Body)
-						if err != nil {
-							log.Printf("# Notariat: Failed reading POST request response: %s\n", err)
-						} else {
-							var jsonResponse utils.JWTResponse
-							json.Unmarshal(resBody, &jsonResponse)
-							if jsonResponse.Token != "" {
-								claims, err := utils.CheckJWTToken(jsonResponse.Token, c)
-								if err == nil {
-									log.Printf("- Logged in (ID: %d, Name: %s, Module: %d, Role: %d, Owner UUID: %v, Exp. Time: %s)",
-										claims.ID, claims.Name, claims.Module, claims.AccRole, claims.OwnerUUID, claims.RegisteredClaims.ExpiresAt)
-									utils.SetJWTTokenFromSession(c, &jsonResponse.Token, &jsonResponse.Refresh)
-									role := claims.AccRole
-									name := claims.Name
-									getRoleHome(c, role, name)
-									return
-								}
-							} else {
-								log.Printf("!! No JWT Token received")
-							}
-						}
-					} else {
-						log.Printf("!! Error status code: %d", res.StatusCode)
-					}
-				}
-			}
-			utils.SetJWTTokenFromSession(c, nil, nil)
-			c.HTML(http.StatusOK, "index.html", gin.H{
-				"LoggedIn":    false,
-				"navbarItems": nil,
-				"Name":        nil,
-			})
-		}
-	}
-}
-func Logout() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		log.Printf("Logged out")
-		utils.SetJWTTokenFromSession(c, nil, nil)
-		c.HTML(http.StatusOK, "index.html", gin.H{
-			"LoggedIn":    false,
-			"navbarItems": nil,
-			"Name":        nil,
-		})
-	}
-}
-
 func Users(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		users := GetUsers(db)
@@ -313,13 +188,13 @@ func CreateUser(db *gorm.DB) gin.HandlerFunc {
 		})
 	}
 }
-
 func Members(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		members := GetMembers(db)
 		c.HTML(http.StatusOK, "members.html", gin.H{
 			"members":     members,
 			"memberRoles": memberRoles,
+			"createPath":  "/admin/createMember",
 		})
 	}
 }
@@ -329,29 +204,44 @@ func CreateMemberForm(db *gorm.DB) gin.HandlerFunc {
 		c.HTML(http.StatusOK, "memberCreate.html", gin.H{
 			"orgs":        orgs,
 			"memberRoles": memberRoles,
+			"submitPath":  c.FullPath(),
 		})
 	}
 }
 func CreateMember(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		orgIdInt, _ := utils.ParseInt(c.PostForm("org_id"))
+		orgId := uint(orgIdInt)
+		ownerOrgId := currentOwnerOrgID(db, c)
+		if ownerOrgId != 0 {
+			orgId = ownerOrgId
+		}
 		roleInt, _ := utils.ParseInt(c.PostForm("role"))
 		member := Member{
 			Names:         c.PostForm("names"),
 			Surnames:      c.PostForm("surnames"),
 			Role:          uint8(roleInt),
-			OrgID:         uint(orgIdInt),
+			OrgID:         orgId,
 			SignaturePath: c.PostForm("signature_path"),
 		}
 		createMember(db, member)
+		if ownerOrgId != 0 {
+			members := GetMembersFromOrg(db, ownerOrgId)
+			c.HTML(http.StatusOK, "members.html", gin.H{
+				"members":     members,
+				"memberRoles": memberRoles,
+				"createPath":  "/org/createMember",
+			})
+			return
+		}
 		members := GetMembers(db)
 		c.HTML(http.StatusOK, "members.html", gin.H{
 			"members":     members,
 			"memberRoles": memberRoles,
+			"createPath":  "/admin/createMember",
 		})
 	}
 }
-
 func Books(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		orgId := parseOrgIDParam(db, c)
@@ -408,10 +298,10 @@ func OrgMembers(db *gorm.DB) gin.HandlerFunc {
 		c.HTML(http.StatusOK, "members.html", gin.H{
 			"members":     members,
 			"memberRoles": memberRoles,
+			"createPath":  "/org/createMember",
 		})
 	}
 }
-
 func GetBookRegisters(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		bookIdStr := c.PostForm("book_id")
@@ -508,7 +398,6 @@ func GetRegisterBaptism(db *gorm.DB) gin.HandlerFunc {
 		})
 	}
 }
-
 func GetCertificatesFromReg(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		regIdInt, _ := utils.ParseInt(c.PostForm("reg_id"))
@@ -628,31 +517,5 @@ func DownloadPDFCertificateBaptism(db *gorm.DB) gin.HandlerFunc {
 		c.Header("Content-Disposition", "attachment; filename="+filepath.Base(pdfFilepath))
 		c.Header("Content-Type", "application/pdf")
 		c.File(pdfFilepath)
-	}
-}
-
-func getRoleHome(c *gin.Context, role uint8, name string) {
-	switch role {
-	case 1:
-		log.Printf("## Administrator")
-		c.HTML(http.StatusOK, "home.html", gin.H{
-			"LoggedIn":    true,
-			"navbarItems": adminNavbarItems,
-			"Name":        name,
-		})
-	case 2:
-		log.Printf("## Organización")
-		c.HTML(http.StatusOK, "home.html", gin.H{
-			"LoggedIn":    true,
-			"navbarItems": orgNavbarItems,
-			"Name":        name,
-		})
-	default:
-		log.Printf("!! No role defined for this value")
-		c.HTML(http.StatusOK, "index.html", gin.H{
-			"LoggedIn":    false,
-			"navbarItems": nil,
-			"Name":        name,
-		})
 	}
 }
