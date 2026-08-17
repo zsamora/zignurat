@@ -151,12 +151,10 @@ func LoginJSON(db *gorm.DB) gin.HandlerFunc {
 					switch module {
 					case 1:
 						log.Printf("## Identirat Account")
-						name = name + " (" + identiratRoles[accountRole] + ")"
 						jwt_token, refresh_token := utils.GenerateJWTTokens(accountID, name, module, accountRole, ownerUUID)
 						c.JSON(http.StatusOK, gin.H{"token": jwt_token, "refresh": refresh_token})
 					case 2:
 						log.Printf("## Notariat Account")
-						name = name + " (" + notariatRoles[accountRole] + ")"
 						jwt_token, refresh_token := utils.GenerateJWTTokens(accountID, name, module, accountRole, ownerUUID)
 						c.JSON(http.StatusOK, gin.H{"token": jwt_token, "refresh": refresh_token})
 					default:
@@ -308,6 +306,7 @@ func getRoleView(c *gin.Context, role uint8, name string) {
 			"LoggedIn":    true,
 			"navbarItems": adminNavbarItems,
 			"Name":        name,
+			"Role":        identiratRoles[role],
 		})
 	default:
 		log.Printf("!! No role defined for this value")

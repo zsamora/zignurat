@@ -24,6 +24,11 @@ var (
 		"/org/certificates": "Verificación",
 		"/org/members":      "Miembros",
 	}
+	accRoleNames = map[uint8]string{
+		accRoleAdministrador: "Administrador",
+		accRoleOrganizacion:  "Organización",
+		accRoleValidador:     "Validador",
+	}
 )
 
 func LandingRoutes(router *gin.Engine) {
@@ -146,6 +151,7 @@ func getRoleHome(c *gin.Context, role uint8, name string) {
 			"LoggedIn":    true,
 			"navbarItems": adminNavbarItems,
 			"Name":        name,
+			"Role":        accRoleNames[role],
 		})
 	case 2, 3:
 		log.Printf("## Organización / Validador")
@@ -153,6 +159,7 @@ func getRoleHome(c *gin.Context, role uint8, name string) {
 			"LoggedIn":    true,
 			"navbarItems": orgNavbarItems,
 			"Name":        name,
+			"Role":        accRoleNames[role],
 		})
 	default:
 		log.Printf("!! No role defined for this value")

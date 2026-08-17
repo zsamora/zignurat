@@ -1,55 +1,20 @@
 {{define "navbar"}}
   <div class="min-h-full">
-    <nav x-data="{ open: false }" class="bg-gray-300 shadow-md mb-3">
+    <nav class="bg-gray-300 shadow-md mb-3">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="relative flex h-16 items-center justify-between border-b border-gray-200">
-          <!--<div class="flex items-center">-->
-            <div class="flex-shrink-0">
-              <!-- Logo<img class="h-8 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=violet&amp;shade=500" alt="Your Company">-->
-            </div>
-            {{if .LoggedIn}}
-              <div class="lg:mr-20 lg:block">
-                <div class="flex-none">
-                  <button hx-get="/home" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
-                      class="italic appearance-none px-3 py-2 rounded-md font-medium text-sm text-gray-900">
-                    {{.Name}}
-                  </button>
-                </div>
-              </div>
-              {{range $url, $title := .navbarItems}}
-                <div class="lg:block">
-                  <div class="flex-auto">
-                    <button hx-get={{$url}} hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
-                            class="hover:bg-gray-300 px-3 py-2 rounded-md text-base font-bold uppercase text-gray-900">{{$title}}</button>
-                  </div>
-                </div>
-              {{end}}
-              <div class="lg:ml-20 lg:block">
-                <div class="flex-none">
-                  <button hx-get="/logout" hx-trigger="click" hx-target="#html-all" hx-swap="innerHTML"
-                          class="px-4 py-2 bg-stone-600 hover:bg-stone-500 px-4 mx-2 border-b-4 border-stone-400 hover:border-stone-300 text-sm font-bold text-white rounded">
-                        Cerrar Sesión</button>
-                </div>
-              </div>
-            {{else}}
-              {{range $url, $title := .navbarItems}}
-                <div class="lg:ml-20 lg:block">
-                  <div class="flex space-x-4">
-                    <button hx-get={{$url}} hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
-                            class="hover:bg-gray-300 px-3 py-2 rounded-md text-base font-bold uppercase text-gray-900">{{$title}}</button>
-                  </div>
-                </div>
-              {{end}}
-              <div class="lg:ml-20 lg:block">
-                <div class="absolute right-10 bottom-3">
-                  <button hx-get="/loginForm" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
-                          class="px-4 py-2 bg-stone-600 hover:bg-stone-500 px-4 mx-2 border-b-4 border-stone-400 hover:border-stone-300 text-sm font-bold text-white rounded">
-                        Iniciar Sesión</button>
-                </div>
-              </div>
+        <div class="relative flex h-16 items-center justify-center border-b border-gray-200">
+          <div class="absolute left-4 sm:left-6 lg:left-8 flex-shrink-0">
+            <!-- Logo<img class="h-8 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=violet&amp;shade=500" alt="Your Company">-->
+          </div>
+          <div class="flex items-center justify-center gap-6">
+            {{range $url, $title := .navbarItems}}
+              <button hx-get={{$url}} hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+                      class="hover:bg-gray-300 px-3 py-2 rounded-md text-base font-bold uppercase text-gray-900">{{$title}}</button>
             {{end}}
           </div>
-          <!-- Search section
+        </div>
+      </div>
+      <!-- Search section
           <div class="flex flex-1 justify-center px-2 lg:ml-6 lg:justify-end">
               <div class="w-full max-w-lg lg:max-w-xs">
                   <label for="search" class="sr-only">Search</label>
@@ -107,7 +72,6 @@
               </div>
           </div>
         </div>-->
-      </div>
       <!-- Mobile section
       <div x-description="Mobile menu, show/hide based on menu state." class="border-b border-gray-200 bg-gray-50 lg:hidden" id="mobile-menu" x-show="open">
           <div class="space-y-1 px-2 pt-2 pb-3">
@@ -145,6 +109,32 @@
           </div>
       </div> -->
     </nav>
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-end py-2">
+        {{if .LoggedIn}}
+        <div x-data="{ open: false }" @click.away="open = false" class="relative">
+          <button @click="open = !open" type="button"
+                  class="flex items-center gap-2 p-4 rounded-md text-sm font-medium text-gray-900 bg-gray-100 hover:bg-gray-200">
+            <span class="italic">{{.Name}}</span>
+            {{if .Role}}<span class="text-xs uppercase text-gray-600">({{.Role}})</span>{{end}}
+            <svg class="h-4 w-4 transition-transform" :class="{ 'rotate-180': open }" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+            </svg>
+          </button>
+          <div x-show="open" x-transition x-cloak
+               class="absolute right-0 z-10 mt-2 w-40 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+            <button hx-get="/logout" hx-trigger="click" hx-target="#html-all" hx-swap="innerHTML"
+                    class="block w-full text-left px-4 py-2 text-sm font-bold text-white bg-stone-600 hover:bg-stone-500 rounded-md">
+              Cerrar Sesión</button>
+          </div>
+        </div>
+        {{else}}
+        <button hx-get="/loginForm" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+                class="px-4 py-2 bg-stone-600 hover:bg-stone-500 mx-2 border-b-4 border-stone-400 hover:border-stone-300 text-sm font-bold text-white rounded">
+          Iniciar Sesión</button>
+        {{end}}
+      </div>
+    </div>
   </div>
   <div id="content-div" class="font-[sans-serif] max-w-6xl p-4 mx-auto mt-2">
 {{end}}

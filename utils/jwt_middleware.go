@@ -76,11 +76,6 @@ func RequireAuthMiddleware(moduleOrigin uint8) gin.HandlerFunc {
 	}
 }
 
-// RequireRoleMiddleware behaves like RequireAuthMiddleware, but additionally
-// checks the token's AccRole against allowedRoles. An unauthenticated request
-// is redirected to /loginForm same as RequireAuthMiddleware; an authenticated
-// request with the wrong role is redirected to / instead, since the account
-// is real and simply belongs on a different page, not the login form.
 func RequireRoleMiddleware(moduleOrigin uint8, allowedRoles ...uint8) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if !setAuthContext(c, moduleOrigin) {
