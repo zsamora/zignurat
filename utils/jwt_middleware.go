@@ -148,9 +148,9 @@ func ParseJWTToken(jwtToken string) (*jwt.Token, error) {
 		return []byte(JwtSecret), nil
 	})
 }
-func GenerateJWTTokens(accId int64, name string, module uint8, accRole uint8, ownerUUID *uuid.UUID) (signedToken string, signedRefreshToken string) {
+func GenerateJWTTokens(accID int64, name string, module uint8, accRole uint8, ownerUUID *uuid.UUID) (signedToken string, signedRefreshToken string) {
 	claims := &JWTClaims{
-		ID:        accId,
+		ID:        accID,
 		Name:      name,
 		Module:    module,
 		AccRole:   accRole,

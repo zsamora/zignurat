@@ -14,20 +14,20 @@ var bookTypes = map[uint8]string{
 	2: "Bautismo",
 }
 
-func ParseOrgType(orgTypeId uint8) string {
-	orgName, found := orgTypes[orgTypeId]
+func ParseOrgType(orgTypeID uint8) string {
+	orgName, found := orgTypes[orgTypeID]
 	if found {
 		return orgName
 	}
-	log.Printf("Key %d not found in org types", orgTypeId)
+	log.Printf("Key %d not found in org types", orgTypeID)
 	return ""
 }
 
-func ParseBookType(bookTypeId uint8) string {
-	bookName, found := bookTypes[bookTypeId]
+func ParseBookType(bookTypeID uint8) string {
+	bookName, found := bookTypes[bookTypeID]
 	if found {
 		return bookName
 	}
-	log.Printf("Key %d not found in book types", bookTypeId)
+	log.Printf("Key %d not found in book types", bookTypeID)
 	return ""
 }

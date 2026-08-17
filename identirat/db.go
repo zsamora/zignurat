@@ -59,7 +59,7 @@ func createAccount(db *gorm.DB, acc Account) {
 	log.Printf("# Identirat: N° rows inserted: %d", result.RowsAffected)
 }
 
-func getAccountById(db *gorm.DB, id int64) Account {
+func getAccountByID(db *gorm.DB, id int64) Account {
 	var account Account
 	result := db.First(&account, id)
 	if result.Error != nil {

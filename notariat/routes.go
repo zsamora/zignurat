@@ -119,12 +119,12 @@ func currentOwnerOrgID(db *gorm.DB, c *gin.Context) uint {
 }
 func parseOrgIDParam(db *gorm.DB, c *gin.Context) uint {
 	if idStr := c.PostForm("org_id"); idStr != "" {
-		orgIdInt, _ := utils.ParseInt(idStr)
-		return uint(orgIdInt)
+		orgIDInt, _ := utils.ParseInt(idStr)
+		return uint(orgIDInt)
 	}
 	if idStr := c.Query("org_id"); idStr != "" {
-		orgIdInt, _ := utils.ParseInt(idStr)
-		return uint(orgIdInt)
+		orgIDInt, _ := utils.ParseInt(idStr)
+		return uint(orgIDInt)
 	}
 	return currentOwnerOrgID(db, c)
 }
@@ -210,23 +210,23 @@ func CreateMemberForm(db *gorm.DB) gin.HandlerFunc {
 }
 func CreateMember(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		orgIdInt, _ := utils.ParseInt(c.PostForm("org_id"))
-		orgId := uint(orgIdInt)
-		ownerOrgId := currentOwnerOrgID(db, c)
-		if ownerOrgId != 0 {
-			orgId = ownerOrgId
+		orgIDInt, _ := utils.ParseInt(c.PostForm("org_id"))
+		orgID := uint(orgIDInt)
+		ownerOrgID := currentOwnerOrgID(db, c)
+		if ownerOrgID != 0 {
+			orgID = ownerOrgID
 		}
 		roleInt, _ := utils.ParseInt(c.PostForm("role"))
 		member := Member{
 			Names:         c.PostForm("names"),
 			Surnames:      c.PostForm("surnames"),
 			Role:          uint8(roleInt),
-			OrgID:         orgId,
+			OrgID:         orgID,
 			SignaturePath: c.PostForm("signature_path"),
 		}
 		createMember(db, member)
-		if ownerOrgId != 0 {
-			members := GetMembersFromOrg(db, ownerOrgId)
+		if ownerOrgID != 0 {
+			members := GetMembersFromOrg(db, ownerOrgID)
 			c.HTML(http.StatusOK, "members.html", gin.H{
 				"members":     members,
 				"memberRoles": memberRoles,
@@ -244,48 +244,48 @@ func CreateMember(db *gorm.DB) gin.HandlerFunc {
 }
 func Books(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		orgId := parseOrgIDParam(db, c)
-		books := getBooksFromOrg(db, orgId)
+		orgID := parseOrgIDParam(db, c)
+		books := getBooksFromOrg(db, orgID)
 		c.HTML(http.StatusOK, "books.html", gin.H{
-			"OrgID": orgId,
+			"OrgID": orgID,
 			"books": books,
 		})
 	}
 }
 func CreateBookForm(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		orgId := parseOrgIDParam(db, c)
+		orgID := parseOrgIDParam(db, c)
 		data := gin.H{"orgs": GetOrganizations(db)}
-		if orgId != 0 {
-			data["Org"] = GetOrganizationFromId(db, orgId)
+		if orgID != 0 {
+			data["Org"] = GetOrganizationFromID(db, orgID)
 		}
 		c.HTML(http.StatusOK, "createBook.html", data)
 	}
 }
 func AddBook(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		orgIdInt, _ := utils.ParseInt(c.PostForm("org_id"))
-		orgId := uint(orgIdInt)
+		orgIDInt, _ := utils.ParseInt(c.PostForm("org_id"))
+		orgID := uint(orgIDInt)
 		bookNrInt, _ := utils.ParseInt(c.PostForm("book_nr"))
 		book := Book{
-			OrgID:       orgId,
+			OrgID:       orgID,
 			BookType:    2,
 			BookNr:      uint8(bookNrInt),
 			DateInitial: utils.ParseDateForm(c.PostForm("date_initial")),
 			DateFinal:   utils.ParseDateForm(c.PostForm("date_final")),
 		}
 		createBook(db, book)
-		books := getBooksFromOrg(db, orgId)
+		books := getBooksFromOrg(db, orgID)
 		c.HTML(http.StatusOK, "books.html", gin.H{
-			"OrgID": orgId,
+			"OrgID": orgID,
 			"books": books,
 		})
 	}
 }
 func Certificates(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		orgId := currentOwnerOrgID(db, c)
-		certsBap := getCertificatesBaptismFromOrg(db, orgId)
+		orgID := currentOwnerOrgID(db, c)
+		certsBap := getCertificatesBaptismFromOrg(db, orgID)
 		c.HTML(http.StatusOK, "certificatesOrg.html", gin.H{
 			"certs_bap": certsBap,
 		})
@@ -293,8 +293,8 @@ func Certificates(db *gorm.DB) gin.HandlerFunc {
 }
 func OrgMembers(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		orgId := currentOwnerOrgID(db, c)
-		members := GetMembersFromOrg(db, orgId)
+		orgID := currentOwnerOrgID(db, c)
+		members := GetMembersFromOrg(db, orgID)
 		c.HTML(http.StatusOK, "members.html", gin.H{
 			"members":     members,
 			"memberRoles": memberRoles,
@@ -304,14 +304,14 @@ func OrgMembers(db *gorm.DB) gin.HandlerFunc {
 }
 func GetBookRegisters(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		bookIdStr := c.PostForm("book_id")
-		if bookIdStr == "" {
-			bookIdStr = c.Query("book_id")
+		bookIDStr := c.PostForm("book_id")
+		if bookIDStr == "" {
+			bookIDStr = c.Query("book_id")
 		}
-		bookIdInt, _ := utils.ParseInt(bookIdStr)
-		bookId := uint(bookIdInt)
-		book := getBookFromId(db, bookId)
-		regsBap := getRegistersBaptismFromBook(db, bookId)
+		bookIDInt, _ := utils.ParseInt(bookIDStr)
+		bookID := uint(bookIDInt)
+		book := getBookFromID(db, bookID)
+		regsBap := getRegistersBaptismFromBook(db, bookID)
 		c.HTML(http.StatusOK, "registerBaptismAll.html", gin.H{
 			"OrgID":    book.OrgID,
 			"Book":     book,
@@ -321,38 +321,38 @@ func GetBookRegisters(db *gorm.DB) gin.HandlerFunc {
 }
 func CreateRegisterBaptismForm(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		orgIdInt, _ := utils.ParseInt(c.PostForm("org_id"))
-		orgId := uint(orgIdInt)
-		bookIdInt, _ := utils.ParseInt(c.PostForm("book_id"))
-		bookId := uint(bookIdInt)
-		book := getBookFromId(db, bookId)
-		indexId := getLastIndexBaptismID(db) + 1
+		orgIDInt, _ := utils.ParseInt(c.PostForm("org_id"))
+		orgID := uint(orgIDInt)
+		bookIDInt, _ := utils.ParseInt(c.PostForm("book_id"))
+		bookID := uint(bookIDInt)
+		book := getBookFromID(db, bookID)
+		indexID := getLastIndexBaptismID(db) + 1
 		data := gin.H{
 			"Book":    book,
-			"IndexID": indexId,
-			"books":   getBooksFromOrg(db, orgId),
+			"IndexID": indexID,
+			"books":   getBooksFromOrg(db, orgID),
 			"orgs":    GetOrganizations(db),
 		}
-		if orgId != 0 {
-			data["Org"] = GetOrganizationFromId(db, orgId)
+		if orgID != 0 {
+			data["Org"] = GetOrganizationFromID(db, orgID)
 		}
 		c.HTML(http.StatusOK, "registerBaptismCreate.html", data)
 	}
 }
 func AddRegisterBaptism(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		bookIdInt, _ := utils.ParseInt(c.PostForm("book_id"))
-		bookId := uint(bookIdInt)
-		indexIdInt, _ := utils.ParseInt(c.PostForm("index_id"))
-		indexId := uint(indexIdInt)
+		bookIDInt, _ := utils.ParseInt(c.PostForm("book_id"))
+		bookID := uint(bookIDInt)
+		indexIDInt, _ := utils.ParseInt(c.PostForm("index_id"))
+		indexID := uint(indexIDInt)
 		pageNrInt, _ := utils.ParseInt(c.PostForm("page_nr"))
 		regNrInt, _ := utils.ParseInt(c.PostForm("reg_nr"))
 		orgBaptismInt, _ := utils.ParseInt(c.PostForm("org_baptism"))
 		reg := RegisterBaptism{
-			BookID:        bookId,
+			BookID:        bookID,
 			PageNumber:    uint16(pageNrInt),
 			RegNumber:     uint16(regNrInt),
-			IndexID:       indexId,
+			IndexID:       indexID,
 			OrgBaptism:    uint(orgBaptismInt),
 			Baptizer:      c.PostForm("baptizer"),
 			DateBaptism:   utils.ParseDateForm(c.PostForm("date_baptism")),
@@ -368,11 +368,11 @@ func AddRegisterBaptism(db *gorm.DB) gin.HandlerFunc {
 			Godfather:     c.PostForm("godfather"),
 			Godmother:     c.PostForm("godmother"),
 		}
-		regId := createRegisterBaptism(db, reg)
-		regNew := getRegisterBaptismFromId(db, regId)
-		updateOrInsertIndexBaptism(db, indexId, regNew)
-		book := getBookFromId(db, regNew.BookID)
-		org := GetOrganizationFromId(db, regNew.OrgBaptism)
+		regID := createRegisterBaptism(db, reg)
+		regNew := getRegisterBaptismFromID(db, regID)
+		updateOrInsertIndexBaptism(db, indexID, regNew)
+		book := getBookFromID(db, regNew.BookID)
+		org := GetOrganizationFromID(db, regNew.OrgBaptism)
 		c.HTML(http.StatusOK, "registerBaptismSingle.html", gin.H{
 			"RegBap":  regNew,
 			"BookBap": book,
@@ -382,15 +382,15 @@ func AddRegisterBaptism(db *gorm.DB) gin.HandlerFunc {
 }
 func GetRegisterBaptism(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		regIdStr := c.PostForm("reg_id")
-		if regIdStr == "" {
-			regIdStr = c.Query("reg_id")
+		regIDStr := c.PostForm("reg_id")
+		if regIDStr == "" {
+			regIDStr = c.Query("reg_id")
 		}
-		regIdInt, _ := utils.ParseInt(regIdStr)
-		regId := uint(regIdInt)
-		reg := getRegisterBaptismFromId(db, regId)
-		book := getBookFromId(db, reg.BookID)
-		org := GetOrganizationFromId(db, reg.OrgBaptism)
+		regIDInt, _ := utils.ParseInt(regIDStr)
+		regID := uint(regIDInt)
+		reg := getRegisterBaptismFromID(db, regID)
+		book := getBookFromID(db, reg.BookID)
+		org := GetOrganizationFromID(db, reg.OrgBaptism)
 		c.HTML(http.StatusOK, "registerBaptismSingle.html", gin.H{
 			"RegBap":  reg,
 			"BookBap": book,
@@ -400,32 +400,32 @@ func GetRegisterBaptism(db *gorm.DB) gin.HandlerFunc {
 }
 func GetCertificatesFromReg(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		regIdInt, _ := utils.ParseInt(c.PostForm("reg_id"))
-		regId := uint(regIdInt)
-		reg := getRegisterBaptismFromId(db, regId)
-		orgId := currentOwnerOrgID(db, c)
-		if orgId == 0 {
-			orgId = reg.OrgBaptism
+		regIDInt, _ := utils.ParseInt(c.PostForm("reg_id"))
+		regID := uint(regIDInt)
+		reg := getRegisterBaptismFromID(db, regID)
+		orgID := currentOwnerOrgID(db, c)
+		if orgID == 0 {
+			orgID = reg.OrgBaptism
 		}
-		certsBap := getCertificatesBaptismFromOrgAndReg(db, orgId, regId)
+		certsBap := getCertificatesBaptismFromOrgAndReg(db, orgID, regID)
 		c.HTML(http.StatusOK, "certificatesOrg.html", gin.H{
 			"certs_bap": certsBap,
-			"RegID":     regId,
+			"RegID":     regID,
 		})
 	}
 }
 func CreateCertificateForm(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		regIdInt, _ := utils.ParseInt(c.PostForm("reg_id"))
-		regId := uint(regIdInt)
-		reg := getRegisterBaptismFromId(db, regId)
-		orgId := currentOwnerOrgID(db, c)
-		if orgId == 0 {
-			orgId = reg.OrgBaptism
+		regIDInt, _ := utils.ParseInt(c.PostForm("reg_id"))
+		regID := uint(regIDInt)
+		reg := getRegisterBaptismFromID(db, regID)
+		orgID := currentOwnerOrgID(db, c)
+		if orgID == 0 {
+			orgID = reg.OrgBaptism
 		}
-		org := GetOrganizationFromId(db, orgId)
-		orgBap := GetOrganizationFromId(db, reg.OrgBaptism)
-		bookBap := getBookFromId(db, reg.BookID)
+		org := GetOrganizationFromID(db, orgID)
+		orgBap := GetOrganizationFromID(db, reg.OrgBaptism)
+		bookBap := getBookFromID(db, reg.BookID)
 		validators := GetMembersFromOrgAndRole(db, org.ID, 1)
 		c.HTML(http.StatusOK, "certificateCreate.html", gin.H{
 			"RegBap":     reg,
@@ -438,39 +438,39 @@ func CreateCertificateForm(db *gorm.DB) gin.HandlerFunc {
 }
 func AddCertificateBaptism(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		orgIdInt, _ := utils.ParseInt(c.PostForm("org_id"))
-		orgId := uint(orgIdInt)
-		regIdInt, _ := utils.ParseInt(c.PostForm("reg_id"))
+		orgIDInt, _ := utils.ParseInt(c.PostForm("org_id"))
+		orgID := uint(orgIDInt)
+		regIDInt, _ := utils.ParseInt(c.PostForm("reg_id"))
 		userValInt, _ := utils.ParseInt(c.PostForm("user_val"))
 		cert := CertificateBaptism{
-			OrgEmisor:      orgId,
-			RegID:          uint(regIdInt),
+			OrgEmisor:      orgID,
+			RegID:          uint(regIDInt),
 			UserValidator:  uint(userValInt),
 			DateEmission:   utils.ParseDateForm(c.PostForm("date_emission")),
 			DateExpiration: utils.ParseDateForm(c.PostForm("date_expiration")),
 		}
 		createCertificateBaptism(db, cert)
-		certsBap := getCertificatesBaptismFromOrg(db, orgId)
+		certsBap := getCertificatesBaptismFromOrg(db, orgID)
 		c.HTML(http.StatusOK, "certificatesOrg.html", gin.H{
 			"certs_bap": certsBap,
-			"RegID":     uint(regIdInt),
+			"RegID":     uint(regIDInt),
 		})
 	}
 }
 func DownloadPDFCertificateBaptism(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		certId := c.PostForm("cert_id")
+		certID := c.PostForm("cert_id")
 		certUUID := c.PostForm("cert_uuid")
 		dateEmission := c.PostForm("date_emi")
 		dateExpiration := c.PostForm("date_exp")
 		orgEmisorInt, _ := utils.ParseInt(c.PostForm("org_emisor"))
-		orgId := uint(orgEmisorInt)
-		org := GetOrganizationFromId(db, orgId)
-		regIdInt, _ := utils.ParseInt(c.PostForm("reg_id"))
-		regId := uint(regIdInt)
-		reg := getRegisterBaptismFromId(db, regId)
-		regBook := getBookFromId(db, reg.BookID)
-		regOrgBaptism := GetOrganizationFromId(db, reg.OrgBaptism)
+		orgID := uint(orgEmisorInt)
+		org := GetOrganizationFromID(db, orgID)
+		regIDInt, _ := utils.ParseInt(c.PostForm("reg_id"))
+		regID := uint(regIDInt)
+		reg := getRegisterBaptismFromID(db, regID)
+		regBook := getBookFromID(db, reg.BookID)
+		regOrgBaptism := GetOrganizationFromID(db, reg.OrgBaptism)
 		regOrgBaptismTotal := ParseOrgType(regOrgBaptism.OrgType) + " " + regOrgBaptism.Name
 		regBaptNameS := ""
 		if reg.BaptizedNameS != "" {
@@ -478,9 +478,9 @@ func DownloadPDFCertificateBaptism(db *gorm.DB) gin.HandlerFunc {
 		}
 		userValInt, _ := utils.ParseInt(c.PostForm("user_val"))
 		userValidator := uint(userValInt)
-		validator := GetMemberFromId(db, userValidator)
+		validator := GetMemberFromID(db, userValidator)
 		certPDF := CertificateBaptismPDF{
-			CertID:             certId,
+			CertID:             certID,
 			CertUUID:           certUUID,
 			CertDateEmission:   dateEmission,
 			CertDateExpiration: dateExpiration,

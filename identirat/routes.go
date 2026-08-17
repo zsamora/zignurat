@@ -266,8 +266,8 @@ func SaveAccount(db *gorm.DB) gin.HandlerFunc {
 
 func SetOwner(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		accIdInt, _ := utils.ParseInt(c.PostForm("acc_id"))
-		account := getAccountById(db, int64(accIdInt))
+		accIDInt, _ := utils.ParseInt(c.PostForm("acc_id"))
+		account := getAccountByID(db, int64(accIDInt))
 		ownerUUIDRaw := c.PostForm("owner_uuid")
 		ownerUUID := utils.ParseUUID(ownerUUIDRaw)
 		account.OwnerUUID = &ownerUUID
@@ -281,8 +281,8 @@ func SetOwner(db *gorm.DB) gin.HandlerFunc {
 
 func ChangePassword(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		accIdInt, _ := utils.ParseInt(c.PostForm("acc_id"))
-		account := getAccountById(db, int64(accIdInt))
+		accIDInt, _ := utils.ParseInt(c.PostForm("acc_id"))
+		account := getAccountByID(db, int64(accIDInt))
 		pw := c.PostForm("pw")
 		if pw == "" {
 			c.HTML(http.StatusOK, "changePassword.html", gin.H{
