@@ -117,6 +117,16 @@ func currentOwnerOrgID(db *gorm.DB, c *gin.Context) uint {
 	}
 	return GetMemberFromUUID(db, *ownerUUID).OrgID
 }
+
+// currentValidatorID resolves the logged-in account's own Member ID, used to
+// preselect the validator dropdown when a Validador is creating a certificate.
+func currentValidatorID(db *gorm.DB, c *gin.Context) uint {
+	ownerUUID := currentOwnerUUID(c)
+	if ownerUUID == nil {
+		return 0
+	}
+	return GetMemberFromUUID(db, *ownerUUID).ID
+}
 func parseOrgIDParam(db *gorm.DB, c *gin.Context) uint {
 	if idStr := c.PostForm("org_id"); idStr != "" {
 		orgIDInt, _ := utils.ParseInt(idStr)
@@ -428,11 +438,12 @@ func CreateCertificateForm(db *gorm.DB) gin.HandlerFunc {
 		bookBap := getBookFromID(db, reg.BookID)
 		validators := GetMembersFromOrgAndRole(db, org.ID, 1)
 		c.HTML(http.StatusOK, "certificateCreate.html", gin.H{
-			"RegBap":     reg,
-			"Org":        org,
-			"OrgBap":     orgBap,
-			"BookBap":    bookBap,
-			"validators": validators,
+			"RegBap":      reg,
+			"Org":         org,
+			"OrgBap":      orgBap,
+			"BookBap":     bookBap,
+			"validators":  validators,
+			"ValidatorID": currentValidatorID(db, c),
 		})
 	}
 }

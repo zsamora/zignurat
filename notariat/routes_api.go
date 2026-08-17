@@ -27,7 +27,7 @@ func GetOrganizationsJSON(db *gorm.DB) gin.HandlerFunc {
 		for _, org := range orgs {
 			summaries = append(summaries, ownerStruct{
 				UUID:        org.UUID,
-				DisplayName: ParseOrgType(org.OrgType) + " - " + org.Name,
+				DisplayName: ParseOrgType(org.OrgType) + " " + org.Name,
 			})
 		}
 		c.JSON(http.StatusOK, summaries)
