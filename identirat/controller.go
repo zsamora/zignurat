@@ -21,6 +21,7 @@ func IdentiratController() http.Handler {
 		"parseDate": utils.FormatDate,
 	})
 	router.Static("/img", "./img")
+	router.Static("/static", "./static")
 	router.LoadHTMLGlob("templates/**/*")
 	store := cookie.NewStore([]byte(utils.GetConfig("SESSION_SECRET")))
 	store.Options(sessions.Options{

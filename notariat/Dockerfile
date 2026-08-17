@@ -17,8 +17,19 @@ WORKDIR /build
 COPY notariat/ ./notariat/
 COPY utils/ ./utils/
 
-# Build the application
+# Static Tailwind CSS v3.4.17
 WORKDIR /build/notariat
+RUN ARCH=$(uname -m) && \
+    case "$ARCH" in \
+        x86_64) TW_ARCH=x64 ;; \
+        aarch64) TW_ARCH=arm64 ;; \
+        *) echo "Unsupported architecture: $ARCH" && exit 1 ;; \
+    esac && \
+    curl -sLo /usr/local/bin/tailwindcss "https://github.com/tailwindlabs/tailwindcss/releases/download/v3.4.17/tailwindcss-linux-${TW_ARCH}" && \
+    chmod +x /usr/local/bin/tailwindcss
+RUN mkdir -p static && tailwindcss -i ./tailwind/input.css -o ./static/tailwind.css --minify
+
+# Build the application
 RUN go build -o notariat-app
 
 # Ports exposed

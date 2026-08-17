@@ -5,6 +5,10 @@
 /identirat/identirat
 /identirat/identirat-app
 
+# Generated Tailwind CSS bundles (built by the Dockerfile, not tracked)
+/identirat/static/
+/notariat/static/
+
 # IDE, AI and OS
 .idea/
 .vscode/
