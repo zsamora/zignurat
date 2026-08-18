@@ -317,3 +317,20 @@ func getBooksIndexBaptismFromOrg(db *gorm.DB, orgID uint) []Book {
 	log.Printf("N° books with baptism index from org %d in database: %d", orgID, result.RowsAffected)
 	return booksIndex
 }
+func createInscription(db *gorm.DB, inscription Inscription) {
+	result := db.Create(&inscription)
+	if result.Error != nil {
+		log.Printf("Error inserting inscription: %s", result.Error)
+	}
+	log.Printf("N° rows inserted: %d", result.RowsAffected)
+}
+func getInscriptionsFromOrg(db *gorm.DB, orgID uint) []Inscription {
+	var inscriptions []Inscription
+	result := db.Find(&inscriptions, Inscription{OrgID: orgID})
+	if result.Error != nil {
+		log.Printf("Error obtaining inscriptions from org: %s", result.Error)
+		return nil
+	}
+	log.Printf("N° inscriptions from organization %d in database: %d", orgID, result.RowsAffected)
+	return inscriptions
+}

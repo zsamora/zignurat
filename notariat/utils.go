@@ -25,6 +25,11 @@ var certificatePurposes = map[uint8]string{
 	1: "Otro",
 }
 
+var opTypes = map[uint16]string{
+	1: "Creación",
+	2: "Update",
+}
+
 func ParseOrgType(orgTypeID uint8) string {
 	orgName, found := orgTypes[orgTypeID]
 	if found {
@@ -58,5 +63,14 @@ func ParseCertPurpose(certPurposeID uint8) string {
 		return purposeName
 	}
 	log.Printf("Key %d not found in certificate purposes", certPurposeID)
+	return ""
+}
+
+func ParseOpType(opTypeID uint16) string {
+	opName, found := opTypes[opTypeID]
+	if found {
+		return opName
+	}
+	log.Printf("Key %d not found in operation types", opTypeID)
 	return ""
 }

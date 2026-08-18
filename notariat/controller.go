@@ -24,6 +24,7 @@ func NotariatController() http.Handler {
 		"parseBookType":    ParseBookType,
 		"parseSacrType":    ParseSacrType,
 		"parseCertPurpose": ParseCertPurpose,
+		"parseOpType":      ParseOpType,
 	})
 	router.Static("/img", "./img")
 	router.Static("/pdf", "./pdf")
@@ -45,6 +46,7 @@ func NotariatController() http.Handler {
 	RegisterRoutes(router, db)
 	CertificateRoutes(router, db)
 	RequestRoutes(router, db)
+	InscriptionRoutes(router, db)
 	InternalRoutes(router, db)
 	return router
 }

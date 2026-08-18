@@ -38,6 +38,16 @@ type Member struct {
 	UUID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();<-:create"`
 }
 
+type Inscription struct {
+	OrgID     uint
+	OpType    uint16
+	RegID     uint
+	UserInsID uint
+	DateIns   time.Time
+	UserValID uint
+	DateVal   time.Time
+}
+
 type Book struct {
 	gorm.Model
 	OrgID            uint
