@@ -1,0 +1,6 @@
+apiVersion: v2
+name: zignurat
+description: Identity, registry and certificate suite
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

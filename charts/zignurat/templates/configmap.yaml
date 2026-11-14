@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zignurat-config
+data:
+  {{- range $key, $value := .Values.config }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+  {{- range $name, $app := .Values.apps }}
+  {{- $p := upper $name }}
+  {{ $p }}_PORT: {{ $app.port | quote }}
+  {{ $p }}_URL: {{ $app.serviceName | quote }}
+  {{ $p }}_DB_HOST: {{ printf "%s-db" $name | quote }}
+  {{ $p }}_DB_PORT: "5432"
+  {{ $p }}_DB_NAME: {{ $app.db.name | quote }}
+  {{ $p }}_DB_USER: {{ $app.db.user | quote }}
+  {{- end }}

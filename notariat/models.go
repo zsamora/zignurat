@@ -1,0 +1,153 @@
+package main
+
+import (
+	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
+
+type User struct {
+	gorm.Model
+	Names     string
+	Surnames  string
+	DateBirth time.Time
+	UUID      uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();<-:create"`
+}
+
+type Organization struct {
+	gorm.Model
+	OrgType  uint8
+	Name     string
+	Diocese  string
+	Commune  string
+	Address  string
+	SealPath string
+	Books    []Book    `gorm:"foreignKey:OrgID"`
+	UUID     uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();<-:create"`
+}
+
+type Member struct {
+	gorm.Model
+	Names         string
+	Surnames      string
+	Role          uint8
+	OrgID         uint
+	Organization  Organization `gorm:"foreignKey:OrgID"`
+	SignaturePath string
+	UUID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();<-:create"`
+}
+
+type Inscription struct {
+	OrgID     uint
+	OpType    uint16
+	RegID     uint
+	UserInsID uint
+	DateIns   time.Time
+	UserValID uint
+	DateVal   time.Time
+}
+
+type Book struct {
+	gorm.Model
+	OrgID            uint
+	BookNr           uint8
+	DateInitial      time.Time
+	DateFinal        time.Time
+	RegistersBaptism []RegisterBaptism `gorm:"foreignKey:BookID"`
+	IndexBaptism     []IndexBaptism    `gorm:"foreignKey:BookID"`
+	UUID             uuid.UUID         `gorm:"type:uuid;default:gen_random_uuid();<-:create"`
+	BookType         uint8
+}
+
+type RegisterBaptism struct {
+	gorm.Model
+	BookID        uint
+	PageNumber    uint16
+	RegNumber     uint16
+	IndexID       uint
+	OrgBaptism    uint
+	Baptizer      string
+	DateBaptism   time.Time
+	BaptizedNameF string
+	BaptizedNameS string
+	RUT           string
+	DateBirth     time.Time
+	PlaceBirth    string
+	FatherName    string
+	FatherSurname string
+	MotherName    string
+	MotherSurname string
+	Godfather     string
+	Godmother     string
+	UUID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();<-:create"`
+}
+
+type IndexBaptism struct {
+	gorm.Model
+	OrgID          uint
+	BookID         uint
+	RegID          uint
+	UserSurnameF   string
+	UserSurnameM   string
+	UserNameFirst  string
+	UserNameSecond string
+	PageNumber     uint16
+}
+
+type CertificateBaptism struct {
+	gorm.Model
+	OrgEmisor      uint
+	RegID          uint
+	Register       RegisterBaptism `gorm:"foreignKey:RegID"`
+	UserValidator  uint
+	DateEmission   time.Time
+	DateExpiration time.Time
+	UUID           uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();<-:create"`
+}
+
+type CertificateRequest struct {
+	gorm.Model
+	SacrType     uint8
+	Purpose      uint8
+	External     bool
+	Names        string
+	Surnames     string
+	RUT          string
+	DateBirth    time.Time
+	Mail         string
+	Phone        string
+	OrgUnknown   bool
+	OrgID        uint
+	Organization Organization `gorm:"foreignKey:OrgID"`
+	OrgDetails   string
+	DateUnknown  bool
+	DateEvent    time.Time
+	DateFrom     time.Time
+	DateTo       time.Time
+}
+
+type CertificateBaptismPDF struct {
+	CertID             string
+	CertUUID           string
+	CertDateEmission   string
+	CertDateExpiration string
+	OrgEmiDiocese      string
+	OrgEmiType         string
+	OrgEmiName         string
+	OrgEmiCommune      string
+	OrgEmiAddress      string
+	RegBookNumber      string
+	RegBookPage        string
+	RegOrgBaptism      string
+	RegDateBaptism     string
+	RegUserBaptized    string
+	RegUserRUT         string
+	RegUserBirthDate   string
+	RegUserBirthPlace  string
+	RegUserFather      string
+	RegUserMother      string
+	RegUserGodfather   string
+	RegUserGodmother   string
+	RegValidator       string
+}

@@ -1,0 +1,82 @@
+<div class="flex items-center mb-6">
+    <div class="flex-1">
+        <button hx-get="/index" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML"
+            type="submit" class="bg-gray-500 hover:bg-gray-400 py-2 px-4 mx-2 border-b-4 border-gray-700 hover:border-gray-500 rounded text-sm text-white font-bold ">
+            Inicio </button>
+    </div>
+    <div class="flex-none">
+        <h1 class="text-2xl font-bold text-gray-700 text-center"> Inscripciones realizadas por la organización </h1>
+        <p class="text-m text-gray-500 text-center">
+            {{if .Org.OrgType}} {{.Org.OrgType | parseOrgType}} {{.Org.Name}} {{end}}<span class="font-bold text-xs"> (ID: {{.OrgID}})</span></p>
+    </div>
+    <div class="flex-1">
+        <form hx-post="/createInscription" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML">
+            <input type="hidden" id="org_id" name="org_id" value='{{.OrgID}}' readonly="readonly">
+            <button type="submit"
+                    class="float-right bg-amber-500 hover:bg-amber-400 py-2 px-4 mx-2 border-b-4 border-amber-700 hover:border-amber-500 rounded text-sm text-white font-bold">
+                Nueva Inscripción </button>
+        </form>
+    </div>
+</div>
+<div id="table-content" class="relative flex flex-col w-full h-full overflow-scroll text-gray-700 bg-white shadow-md rounded-lg bg-clip-border my-6">
+    <table class="w-full text-left table-auto min-w-max">
+        <thead>
+        <tr>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Operación
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Reg. ID
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Responsable Inscripción
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Fecha de Inscripción
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Responsable Validación
+                </p>
+            </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Fecha de Validación
+                </p>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {{range .inscriptions}}
+            <tr class="hover:bg-slate-50">
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-xs text-slate-500">{{.OpType | parseOpType}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-xs text-slate-500">{{.RegID}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-xs text-slate-500">{{.UserInsID}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500">{{.DateIns | parseDate}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-xs text-slate-500">{{.UserValID}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500">{{.DateVal | parseDate}}</p>
+                </td>
+            </tr>
+        {{end}}
+        </tbody>
+    </table>
+</div>

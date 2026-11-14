@@ -1,0 +1,9 @@
+# Cluster-wide platform setup (not part of the zignurat Helm chart).
+# Requires Envoy Gateway:
+#   helm install eg oci://docker.io/envoyproxy/gateway-helm --version v1.8.1 -n envoy-gateway-system --create-namespace
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: eg
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller

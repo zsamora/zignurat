@@ -1,0 +1,48 @@
+existingSecret: zignurat-secrets
+
+config:
+  LOG_LEVEL: debug
+  DEV_STAGE: development
+  IDENTIRAT_LOGIN: loginJSON
+
+postgres:
+  image: postgres:17
+
+gateway:
+  className: eg
+
+apps:
+  identirat:
+    image: zignurat/identirat
+    tag: "0.1.0"
+    replicas: 1
+    port: 9000
+    serviceName: identirat-app
+    hostname: identirat.localhost
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        memory: 256Mi
+    db:
+      name: identirat
+      user: postgres
+      storage: 1Gi
+  notariat:
+    image: zignurat/notariat
+    tag: "0.1.0"
+    replicas: 2
+    port: 9002
+    serviceName: notariat-app
+    hostname: notariat.localhost
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        memory: 256Mi
+    db:
+      name: notariat
+      user: postgres
+      storage: 1Gi

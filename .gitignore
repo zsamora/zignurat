@@ -1,0 +1,28 @@
+# Secrets / environment
+.env
+
+# Compiled Go binaries
+/identirat/identirat
+/identirat/identirat-app
+
+# Generated Tailwind CSS bundles (built by the Dockerfile, not tracked)
+/identirat/static/
+/notariat/static/
+
+# IDE, AI and OS
+.idea/
+.vscode/
+.claude/
+*.iml
+.mcp.json
+.DS_Store
+Thumbs.db
+
+# Notariat build artifacts, generated certificates, and local-only PDF assets
+/notariat/notariat
+/notariat/notariat-app
+/notariat/pdf/*.pdf
+/notariat/img/*
+!/notariat/img/firmaparroco.jpg
+!/notariat/img/timbreparroquial.jpg
+/notariat/ttf/

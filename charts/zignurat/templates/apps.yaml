@@ -1,0 +1,77 @@
+{{- range $name, $app := .Values.apps }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}
+spec:
+  replicas: {{ $app.replicas }}
+  selector:
+    matchLabels:
+      app: {{ $name }}
+  template:
+    metadata:
+      labels:
+        app: {{ $name }}
+      annotations:
+        # Changes whenever the ConfigMap changes, which triggers a rolling restart
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
+    spec:
+      containers:
+        - name: {{ $name }}
+          image: "{{ $app.image }}:{{ $app.tag }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ $app.port }}
+          envFrom:
+            - configMapRef:
+                name: zignurat-config
+            - secretRef:
+                name: {{ $.Values.existingSecret }}
+          startupProbe:         # Gives the app time to connect to the DB; liveness waits until this passes
+            httpGet:
+              path: /healthz
+              port: {{ $app.port }}
+            periodSeconds: 2
+            failureThreshold: 45  # Up to 90s to start (connectGORM retries for ~60s)
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: {{ $app.port }}
+            periodSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ $app.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            {{- toYaml $app.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $app.serviceName }}
+spec:
+  selector:
+    app: {{ $name }}
+  ports:
+    - port: {{ $app.port }}
+      targetPort: {{ $app.port }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ $name }}
+spec:
+  parentRefs:
+    - name: zignurat-gateway
+  hostnames:
+    - {{ $app.hostname | quote }}
+  rules:
+    - backendRefs:
+        - name: {{ $app.serviceName }}
+          port: {{ $app.port }}
+{{- end }}

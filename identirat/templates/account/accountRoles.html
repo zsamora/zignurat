@@ -1,0 +1,10 @@
+<select id="acc_role" name="acc_role"
+    hx-get="/admin/getAccRoles" hx-trigger="change from:#module" hx-include="#module" hx-target="#acc_role" hx-swap="outerHTML"
+    class="w-full p-3 bg-white rounded focus:outline-none border border-gray-200 focus:border-gray-400 text-gray-700 text-lg transition ease-in-out duration-200">
+    <option disabled selected value> -- Buscar... -- </option>
+    {{range $key, $value := .accountRoles}}
+    <option value="{{$key}}" 
+        class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+        {{$value}}</option>
+    {{end}}
+</select>
