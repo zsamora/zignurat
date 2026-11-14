@@ -102,6 +102,7 @@ func GetJWTTokenFromSession(c *gin.Context) string {
 		return ""
 	}
 }
+
 func SetJWTTokenFromSession(c *gin.Context, jwtToken, refreshToken string) error {
 	session := sessions.Default(c)
 	session.Set("jwt_token", jwtToken)
@@ -146,6 +147,7 @@ func CheckJWTToken(jwtToken string, c *gin.Context) (*JWTClaims, error) {
 	}
 	return nil, err
 }
+
 func ParseJWTToken(jwtToken string) (*jwt.Token, error) {
 	return jwt.ParseWithClaims(jwtToken, &JWTClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -154,6 +156,7 @@ func ParseJWTToken(jwtToken string) (*jwt.Token, error) {
 		return []byte(JwtSecret), nil
 	})
 }
+
 func GenerateJWTTokens(accID int64, name string, module uint8, accRole uint8, ownerUUID *uuid.UUID) (signedToken string, signedRefreshToken string) {
 	claims := &JWTClaims{
 		ID:        accID,
@@ -178,6 +181,7 @@ func GenerateJWTTokens(accID int64, name string, module uint8, accRole uint8, ow
 	}
 	return token, refreshToken
 }
+
 func redirect(c *gin.Context, target string) {
 	if c.GetHeader("HX-Request") == "true" {
 		c.Header("HX-Redirect", target) // htmx: do a full-page navigation

@@ -96,7 +96,13 @@ func fetchNotariatOwners(path string) []ownerOption {
 	notariatUrl := utils.GetConfig("NOTARIAT_URL")
 	notariatPort := utils.GetConfig("NOTARIAT_PORT")
 	requestURL := fmt.Sprintf("http://%s:%s/internal/%s", notariatUrl, notariatPort, path)
-	res, err := http.Get(requestURL)
+	req, err := http.NewRequest(http.MethodGet, requestURL, nil)
+	if err != nil {
+		log.Printf("# Identirat: Failed creating Notariat %s request: %s", path, err)
+		return nil
+	}
+	req.Header.Set("X-Internal-Token", utils.GetConfig("INTERNAL_TOKEN"))
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Printf("# Identirat: Failed fetching Notariat %s: %s", path, err)
 		return nil

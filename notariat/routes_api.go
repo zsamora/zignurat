@@ -1,18 +1,36 @@
 package main
 
 import (
+	"crypto/subtle"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+
+	"github.com/zsamora/utils"
 )
 
 // InternalRoutes is Notariat API to expose its organizations, members and users to other modules.
 func InternalRoutes(router *gin.Engine, db *gorm.DB) {
-	router.GET("/internal/organizations", GetOrganizationsJSON(db))
-	router.GET("/internal/members", GetMembersJSON(db))
-	router.GET("/internal/users", GetUsersJSON(db))
+	internal := router.Group("/internal")
+	internal.Use(RequireInternalToken(utils.GetConfig("INTERNAL_TOKEN")))
+	{
+		internal.GET("/organizations", GetOrganizationsJSON(db))
+		internal.GET("/members", GetMembersJSON(db))
+		internal.GET("/users", GetUsersJSON(db))
+	}
+}
+
+func RequireInternalToken(expected string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		given := c.GetHeader("X-Internal-Token")
+		if expected == "" || subtle.ConstantTimeCompare([]byte(given), []byte(expected)) != 1 {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+		c.Next()
+	}
 }
 
 type ownerStruct struct {
