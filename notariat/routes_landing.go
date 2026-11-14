@@ -115,7 +115,7 @@ func LoginRequest() gin.HandlerFunc {
 								if err == nil {
 									log.Printf("- Logged in (ID: %d, Name: %s, Module: %d, Role: %d, Owner UUID: %v, Exp. Time: %s)",
 										claims.ID, claims.Name, claims.Module, claims.AccRole, claims.OwnerUUID, claims.RegisteredClaims.ExpiresAt)
-									utils.SetJWTTokenFromSession(c, &jsonResponse.Token, &jsonResponse.Refresh)
+									utils.SetJWTTokenFromSession(c, jsonResponse.Token, jsonResponse.Refresh)
 									role := claims.AccRole
 									name := claims.Name
 									getRoleHome(c, role, name)
@@ -130,7 +130,7 @@ func LoginRequest() gin.HandlerFunc {
 					}
 				}
 			}
-			utils.SetJWTTokenFromSession(c, nil, nil)
+			utils.ClearSession(c)
 			c.HTML(http.StatusOK, "index.html", gin.H{
 				"LoggedIn":    false,
 				"navbarItems": nil,
@@ -142,7 +142,7 @@ func LoginRequest() gin.HandlerFunc {
 func Logout() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		log.Printf("Logged out")
-		utils.SetJWTTokenFromSession(c, nil, nil)
+		utils.ClearSession(c)
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"LoggedIn":    false,
 			"navbarItems": nil,

@@ -14,7 +14,7 @@ gateway:
 apps:
   identirat:
     image: zignurat/identirat
-    tag: "0.1.2"
+    tag: "0.1.3"
     replicas: 1
     port: 9000
     serviceName: identirat-app
@@ -31,7 +31,7 @@ apps:
       storage: 1Gi
   notariat:
     image: zignurat/notariat
-    tag: "0.1.2"
+    tag: "0.1.3"
     replicas: 2
     port: 9002
     serviceName: notariat-app

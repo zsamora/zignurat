@@ -82,7 +82,7 @@ type Login struct {
 
 func LoginForm(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		utils.SetJWTTokenFromSession(c, nil, nil)
+		utils.ClearSession(c)
 		var form Login
 		if err := c.ShouldBind(&form); err == nil {
 			username := form.User
@@ -102,7 +102,7 @@ func LoginForm(db *gorm.DB) gin.HandlerFunc {
 					case 1:
 						log.Printf("## Identirat Account")
 						jwt_token, refresh_token := utils.GenerateJWTTokens(accountID, name, module, accountRole, ownerUUID)
-						utils.SetJWTTokenFromSession(c, &jwt_token, &refresh_token)
+						utils.SetJWTTokenFromSession(c, jwt_token, refresh_token)
 						getRoleView(c, accountRole, name)
 						return
 					default:
@@ -173,7 +173,7 @@ func LoginJSON(db *gorm.DB) gin.HandlerFunc {
 func Logout() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		log.Printf("Logged out")
-		utils.SetJWTTokenFromSession(c, nil, nil)
+		utils.ClearSession(c)
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"LoggedIn":    false,
 			"navbarItems": nil,

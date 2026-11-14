@@ -47,8 +47,8 @@ func loadUser(c *gin.Context, moduleOrigin uint8) bool {
 			}
 			log.Printf("!! JWT Token is for a different module")
 		}
+		ClearSession(c)
 	}
-	SetJWTTokenFromSession(c, nil, nil)
 	c.Set("LoggedIn", false)
 	c.Set("ID", nil)
 	c.Set("Name", nil)
@@ -102,11 +102,25 @@ func GetJWTTokenFromSession(c *gin.Context) string {
 		return ""
 	}
 }
-func SetJWTTokenFromSession(c *gin.Context, jwtToken *string, refreshToken *string) {
+func SetJWTTokenFromSession(c *gin.Context, jwtToken, refreshToken string) error {
 	session := sessions.Default(c)
 	session.Set("jwt_token", jwtToken)
 	session.Set("refresh_token", refreshToken)
-	session.Save()
+	err := session.Save()
+	if err != nil {
+		log.Printf("!! Failed saving session: %s", err)
+	}
+	return err
+}
+
+func ClearSession(c *gin.Context) error {
+	session := sessions.Default(c)
+	session.Clear()
+	err := session.Save()
+	if err != nil {
+		log.Printf("!! Failed clearing session: %s", err)
+	}
+	return err
 }
 
 func GetJWTTokenFromHeader(c *gin.Context) string {
