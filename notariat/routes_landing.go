@@ -39,8 +39,8 @@ var (
 )
 
 func LandingRoutes(router *gin.Engine) {
-	router.GET("/", utils.AuthMiddleware(2), Home())
-	router.GET("/home", utils.AuthMiddleware(2), func(c *gin.Context) {
+	router.GET("/", utils.OptionalAuth(2), Home())
+	router.GET("/home", utils.OptionalAuth(2), func(c *gin.Context) {
 		c.HTML(http.StatusOK, "help.html", gin.H{})
 	})
 	router.GET("/index", func(c *gin.Context) {

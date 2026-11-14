@@ -31,8 +31,8 @@ var (
 )
 
 func LandingRoutes(router *gin.Engine) {
-	router.GET("/", utils.AuthMiddleware(uint8(1)), Home())
-	router.GET("/home", utils.AuthMiddleware(uint8(1)), func(c *gin.Context) {
+	router.GET("/", utils.OptionalAuth(uint8(1)), Home())
+	router.GET("/home", utils.OptionalAuth(uint8(1)), func(c *gin.Context) {
 		c.HTML(http.StatusOK, "help.html", gin.H{})
 	})
 }
@@ -46,7 +46,7 @@ func LoginRoutes(router *gin.Engine, db *gorm.DB) {
 }
 func AuthRoutes(router *gin.Engine, db *gorm.DB) {
 	admin := router.Group("/admin")
-	admin.Use(utils.AuthMiddleware(uint8(1)))
+	admin.Use(utils.RequireRole(uint8(1), uint8(1)))
 	{
 		admin.GET("/accounts", Accounts(db))
 		admin.GET("/createAccount", CreateAccount())

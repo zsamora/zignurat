@@ -15,13 +15,13 @@ import (
 // hitting /getRequests gets their own requests auto-scoped by their account's
 // mail instead of an empty search box.
 func RequestRoutes(router *gin.Engine, db *gorm.DB) {
-	router.GET("/requestCertificate", utils.AuthMiddleware(2), RequestCertificateForm(db))
+	router.GET("/requestCertificate", utils.OptionalAuth(2), RequestCertificateForm(db))
 	router.POST("/requestCertificate", SaveRequestCertificate(db))
-	router.GET("/getRequests", utils.AuthMiddleware(2), SearchRequest(db))
+	router.GET("/getRequests", utils.OptionalAuth(2), SearchRequest(db))
 	router.POST("/getRequestsByMail", GetRequestsByMail(db))
 
 	org := router.Group("/org")
-	org.Use(utils.RequireRoleMiddleware(2, accRoleOrganizacion, accRoleValidador))
+	org.Use(utils.RequireRole(2, accRoleOrganizacion, accRoleValidador))
 	{
 		org.GET("/requests", Requests(db))
 	}

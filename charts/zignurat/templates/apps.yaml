@@ -14,7 +14,6 @@ spec:
       labels:
         app: {{ $name }}
       annotations:
-        # Changes whenever the ConfigMap changes, which triggers a rolling restart
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
     spec:
       containers:
@@ -28,12 +27,12 @@ spec:
                 name: zignurat-config
             - secretRef:
                 name: {{ $.Values.existingSecret }}
-          startupProbe:         # Gives the app time to connect to the DB; liveness waits until this passes
+          startupProbe:
             httpGet:
               path: /healthz
               port: {{ $app.port }}
             periodSeconds: 2
-            failureThreshold: 45  # Up to 90s to start (connectGORM retries for ~60s)
+            failureThreshold: 45
           readinessProbe:
             httpGet:
               path: /readyz

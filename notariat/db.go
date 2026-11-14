@@ -20,8 +20,6 @@ func connectGORM() *gorm.DB {
 	password := utils.GetConfig("NOTARIAT_DB_PW")
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
-	// Retry while the database starts up: on Kubernetes, Pods start in any order,
-	// so the database may not be ready yet when this service starts.
 	const maxAttempts = 30
 	var db *gorm.DB
 	var err error

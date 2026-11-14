@@ -30,7 +30,7 @@ const (
 
 func AdminRoutes(router *gin.Engine, db *gorm.DB) {
 	admin := router.Group("/admin")
-	admin.Use(utils.RequireRoleMiddleware(2, accRoleAdministrador))
+	admin.Use(utils.RequireRole(2, accRoleAdministrador))
 	{
 		admin.GET("/organizations", Organizations(db))
 		admin.GET("/users", Users(db))
@@ -42,14 +42,14 @@ func AdminRoutes(router *gin.Engine, db *gorm.DB) {
 }
 func MemberRoutes(router *gin.Engine, db *gorm.DB) {
 	admin := router.Group("/admin")
-	admin.Use(utils.RequireRoleMiddleware(2, accRoleAdministrador))
+	admin.Use(utils.RequireRole(2, accRoleAdministrador))
 	{
 		admin.GET("/members", Members(db))
 		admin.GET("/createMember", CreateMemberForm(db))
 		admin.POST("/createMember", CreateMember(db))
 	}
 	org := router.Group("/org")
-	org.Use(utils.RequireRoleMiddleware(2, accRoleOrganizacion, accRoleValidador))
+	org.Use(utils.RequireRole(2, accRoleOrganizacion, accRoleValidador))
 	{
 		org.GET("/members", OrgMembers(db))
 		org.GET("/createMember", CreateMemberForm(db))
@@ -58,7 +58,7 @@ func MemberRoutes(router *gin.Engine, db *gorm.DB) {
 }
 func OrgRoutes(router *gin.Engine, db *gorm.DB) {
 	org := router.Group("/org")
-	org.Use(utils.RequireRoleMiddleware(2, accRoleOrganizacion, accRoleValidador))
+	org.Use(utils.RequireRole(2, accRoleOrganizacion, accRoleValidador))
 	{
 		org.GET("/books", Books(db))
 		org.GET("/certificates", Certificates(db))
@@ -77,7 +77,7 @@ func IndexSearch(db *gorm.DB) gin.HandlerFunc {
 }
 func BookRoutes(router *gin.Engine, db *gorm.DB) {
 	org := router.Group("/org")
-	org.Use(utils.RequireRoleMiddleware(2, accRoleAdministrador, accRoleOrganizacion, accRoleValidador))
+	org.Use(utils.RequireRole(2, accRoleAdministrador, accRoleOrganizacion, accRoleValidador))
 	{
 		org.POST("/createBook", CreateBookForm(db))
 		org.POST("/addBook", AddBook(db))
@@ -87,7 +87,7 @@ func BookRoutes(router *gin.Engine, db *gorm.DB) {
 }
 func RegisterRoutes(router *gin.Engine, db *gorm.DB) {
 	org := router.Group("/org")
-	org.Use(utils.RequireRoleMiddleware(2, accRoleAdministrador, accRoleOrganizacion, accRoleValidador))
+	org.Use(utils.RequireRole(2, accRoleAdministrador, accRoleOrganizacion, accRoleValidador))
 	{
 		org.GET("/getBookRegisters", GetBookRegisters(db))
 		org.POST("/getBookRegisters", GetBookRegisters(db))
@@ -99,7 +99,7 @@ func RegisterRoutes(router *gin.Engine, db *gorm.DB) {
 }
 func CertificateRoutes(router *gin.Engine, db *gorm.DB) {
 	org := router.Group("/org")
-	org.Use(utils.RequireRoleMiddleware(2, accRoleAdministrador, accRoleOrganizacion, accRoleValidador))
+	org.Use(utils.RequireRole(2, accRoleAdministrador, accRoleOrganizacion, accRoleValidador))
 	{
 		org.POST("/getCertificatesFromReg", GetCertificatesFromReg(db))
 		org.POST("/createCertificate", CreateCertificateForm(db))

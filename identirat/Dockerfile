@@ -4,8 +4,6 @@ FROM golang:1.26 AS base
 # Move to working directory /build
 WORKDIR /build
 
-# Tailwind CSS standalone binary. Downloaded before any COPY so this layer stays
-# cached when the source changes (and builds keep working offline).
 RUN ARCH=$(uname -m) && \
     case "$ARCH" in \
         x86_64) TW_ARCH=x64 ;; \

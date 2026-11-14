@@ -11,7 +11,7 @@ import (
 
 func InscriptionRoutes(router *gin.Engine, db *gorm.DB) {
 	org := router.Group("/org")
-	org.Use(utils.RequireRoleMiddleware(2, accRoleOrganizacion, accRoleValidador))
+	org.Use(utils.RequireRole(2, accRoleOrganizacion, accRoleValidador))
 	{
 		org.GET("/inscriptions", Inscriptions(db))
 		org.POST("/createInscription", CreateInscription(db))

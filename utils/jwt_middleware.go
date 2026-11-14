@@ -28,7 +28,7 @@ type JWTResponse struct {
 	Error   string
 }
 
-func setAuthContext(c *gin.Context, moduleOrigin uint8) bool {
+func loadUser(c *gin.Context, moduleOrigin uint8) bool {
 	jwtToken := GetJWTTokenFromSession(c)
 	if jwtToken != "" {
 		claims, err := CheckJWTToken(jwtToken, c)
@@ -58,28 +58,27 @@ func setAuthContext(c *gin.Context, moduleOrigin uint8) bool {
 	return false
 }
 
-func AuthMiddleware(moduleOrigin uint8) gin.HandlerFunc {
+func OptionalAuth(moduleOrigin uint8) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		setAuthContext(c, moduleOrigin)
+		loadUser(c, moduleOrigin)
 		c.Next()
 	}
 }
 
-func RequireAuthMiddleware(moduleOrigin uint8) gin.HandlerFunc {
+func RequireLogin(moduleOrigin uint8) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !setAuthContext(c, moduleOrigin) {
-			redirect(c, "/")
+		if !loadUser(c, moduleOrigin) {
+			redirect(c, "/loginForm")
 			return
 		}
 		c.Next()
 	}
 }
 
-func RequireRoleMiddleware(moduleOrigin uint8, allowedRoles ...uint8) gin.HandlerFunc {
+func RequireRole(moduleOrigin uint8, allowedRoles ...uint8) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !setAuthContext(c, moduleOrigin) {
-			c.Redirect(http.StatusFound, "/loginForm")
-			c.Abort()
+		if !loadUser(c, moduleOrigin) {
+			redirect(c, "/loginForm")
 			return
 		}
 		role, _ := c.Get("Role")
