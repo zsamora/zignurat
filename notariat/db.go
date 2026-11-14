@@ -143,16 +143,6 @@ func GetMembersFromOrg(db *gorm.DB, orgID uint) []Member {
 	log.Printf("N° members from organization %d in database: %d", orgID, result.RowsAffected)
 	return members
 }
-func GetMembersFromOrgAndRole(db *gorm.DB, orgID uint, role uint8) []Member {
-	var members []Member
-	result := db.Preload("Organization").Where("org_id = ? AND role = ?", orgID, role).Find(&members)
-	if result.Error != nil {
-		log.Printf("Error obtaining members: %s", result.Error)
-		return nil
-	}
-	log.Printf("N° members from organization %d with role %d in database: %d", orgID, role, result.RowsAffected)
-	return members
-}
 func createMember(db *gorm.DB, member Member) {
 	result := db.Create(&member)
 	log.Printf("Member ID: %d", member.ID)

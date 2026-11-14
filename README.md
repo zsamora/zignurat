@@ -39,8 +39,8 @@ kubectl -n zignurat create secret generic zignurat-secrets \
   --from-literal=INTERNAL_TOKEN="$(openssl rand -hex 32)"
 
 # 3. Build images and deploy
-minikube image build -t zignurat/identirat:0.3.0 -f identirat/Dockerfile .
-minikube image build -t zignurat/notariat:0.3.0 -f notariat/Dockerfile .
+minikube image build -t zignurat/identirat:<version> -f identirat/Dockerfile .
+minikube image build -t zignurat/notariat:<version> -f notariat/Dockerfile .
 helm install zignurat charts/zignurat -n zignurat
 
 # 4. Access (keep running)

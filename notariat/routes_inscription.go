@@ -32,8 +32,7 @@ func Inscriptions(db *gorm.DB) gin.HandlerFunc {
 
 func CreateInscription(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		orgIDInt, _ := utils.ParseInt(c.PostForm("org_id"))
-		orgID := uint(orgIDInt)
+		orgID := currentOwnerOrgID(db, c)
 		inscription := Inscription{
 			OrgID: orgID,
 		}

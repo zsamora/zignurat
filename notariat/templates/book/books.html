@@ -8,12 +8,14 @@
         <h1 class="text-2xl font-bold text-gray-700 text-center pb-2"> Libros </h1>
     </div>
     <div class="flex-1">
+        {{if .CanEdit}}
         <form hx-post="/org/createBook" hx-trigger="click" hx-target="#content-div" hx-swap="innerHTML">
             <input type="hidden" id="org_id" name="org_id" value='{{.OrgID}}' readonly="readonly">
             <button type="submit"
                     class="float-right bg-green-500 hover:bg-green-400 py-2 px-4 mx-2 border-b-4 border-green-600 hover:border-green-400 rounded text-sm text-white font-bold">
                     Nuevo Libro </button>
         </form>
+        {{end}}
     </div>
 </div>
 <div id="table-content" class="flex flex-col h-full my-6 items-center">

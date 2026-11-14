@@ -8,24 +8,17 @@
 <div class="flex flex-wrap -mx-3 mb-3">
     <!-- Organization Emission -->
     <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-        <label for="org_id"
+        <label
             class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Organización Emisora del Certificado</label>
-        <input type="hidden" id="org_id" name="org_id" value='{{.Org.ID}}' readonly="readonly">
         <p class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
             {{.Org.OrgType | parseOrgType}} - {{.Org.Name}}</p>
     </div>
     <!-- User Validator -->
     <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-        <label for="user_val"
+        <label
             class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Encargado de Validación del Certificado </label>
-        <select id="user_val" name="user_val"
-                class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                <option disabled{{if not $.ValidatorID}} selected{{end}} value> -- Seleccione un validador -- </option>
-                {{range .validators}}
-                <option value='{{.ID}}'{{if eq .ID $.ValidatorID}} selected{{end}}
-                      class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">{{.Names}} {{.Surnames}}</option>
-                {{end}}
-        </select>
+        <p class="appearance-none block w-full bg-gray-200 text-gray-700 text-lg border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            {{.Validator.Names}} {{.Validator.Surnames}}</p>
     </div>
 </div>
 <div class="flex flex-wrap -mx-3 mb-3">

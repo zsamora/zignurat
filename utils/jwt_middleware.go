@@ -22,6 +22,7 @@ type JWTClaims struct {
 	OwnerUUID *uuid.UUID
 	jwt.RegisteredClaims
 }
+
 type JWTResponse struct {
 	Token   string
 	Refresh string
