@@ -65,12 +65,6 @@
                     <!-- hx-boost="true" action="/org/downloadPDFCertificateBaptism" method="post"> -->
                     <form action="/org/downloadPDFCertificateBaptism" method="post">  <!--hx-post="/org/downloadPDFCertificateBaptism" hx-target="#content-div" hx-swap="innerHTML" -->
                         <input type="hidden" id="cert_id" name="cert_id" value="{{.ID}}">
-                        <input type="hidden" id="cert_uuid" name="cert_uuid" value="{{.UUID}}">
-                        <input type="hidden" id="org_emisor" name="org_emisor" value="{{.OrgEmisor}}">
-                        <input type="hidden" id="reg_id" name="reg_id" value="{{.RegID}}">
-                        <input type="hidden" id="user_val" name="user_val" value="{{.UserValidator}}">
-                        <input type="hidden" id="date_emi" name="date_emi" value="{{.DateEmission | parseDate}}">
-                        <input type="hidden" id="date_exp" name="date_exp" value="{{.DateExpiration | parseDate}}">
                         <button type="submit"
                                 class="bg-amber-500 hover:bg-amber-400 py-2 px-4 mx-2 border-b-4 border-amber-600 hover:border-amber-400 rounded text-sm text-white font-bold">
                             Descargar </button>

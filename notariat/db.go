@@ -220,6 +220,14 @@ func getRegisterBaptismFromID(db *gorm.DB, regID uint) RegisterBaptism {
 	log.Printf("N° baptism registers in database: %d", result.RowsAffected)
 	return reg
 }
+func getCertificateBaptismFromID(db *gorm.DB, certID uint) CertificateBaptism {
+	var cert CertificateBaptism
+	result := db.First(&cert, certID)
+	if result.Error != nil {
+		log.Printf("Error obtaining baptism certificate: %s", result.Error)
+	}
+	return cert
+}
 func getRegistersBaptismFromBook(db *gorm.DB, bookID uint) []RegisterBaptism {
 	var regs []RegisterBaptism
 	result := db.Where("book_id = ?", bookID).Find(&regs)

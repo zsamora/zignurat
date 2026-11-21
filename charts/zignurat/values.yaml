@@ -31,7 +31,7 @@ apps:
       storage: 1Gi
   notariat:
     image: zignurat/notariat
-    tag: "0.1.5"
+    tag: "0.1.6"
     replicas: 2
     port: 9002
     serviceName: notariat-app

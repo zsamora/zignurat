@@ -1,9 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"net/http"
-	"os"
-	"path/filepath"
 	"slices"
 
 	"github.com/gin-gonic/gin"
@@ -538,16 +538,14 @@ func AddCertificateBaptism(db *gorm.DB) gin.HandlerFunc {
 }
 func DownloadPDFCertificateBaptism(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		certID := c.PostForm("cert_id")
-		certUUID := c.PostForm("cert_uuid")
-		dateEmission := c.PostForm("date_emi")
-		dateExpiration := c.PostForm("date_exp")
-		orgEmisorInt, _ := utils.ParseInt(c.PostForm("org_emisor"))
-		orgID := uint(orgEmisorInt)
-		org := GetOrganizationFromID(db, orgID)
-		regIDInt, _ := utils.ParseInt(c.PostForm("reg_id"))
-		regID := uint(regIDInt)
-		reg := getRegisterBaptismFromID(db, regID)
+		certIDInt, _ := utils.ParseInt(c.PostForm("cert_id"))
+		cert := getCertificateBaptismFromID(db, uint(certIDInt))
+		if !canAccessOrg(db, c, cert.OrgEmisor) {
+			notFound(c)
+			return
+		}
+		org := GetOrganizationFromID(db, cert.OrgEmisor)
+		reg := getRegisterBaptismFromID(db, cert.RegID)
 		regBook := getBookFromID(db, reg.BookID)
 		regOrgBaptism := GetOrganizationFromID(db, reg.OrgBaptism)
 		regOrgBaptismTotal := ParseOrgType(regOrgBaptism.OrgType) + " " + regOrgBaptism.Name
@@ -555,14 +553,12 @@ func DownloadPDFCertificateBaptism(db *gorm.DB) gin.HandlerFunc {
 		if reg.BaptizedNameS != "" {
 			regBaptNameS = " " + reg.BaptizedNameS
 		}
-		userValInt, _ := utils.ParseInt(c.PostForm("user_val"))
-		userValidator := uint(userValInt)
-		validator := GetMemberFromID(db, userValidator)
+		validator := GetMemberFromID(db, cert.UserValidator)
 		certPDF := CertificateBaptismPDF{
-			CertID:             certID,
-			CertUUID:           certUUID,
-			CertDateEmission:   dateEmission,
-			CertDateExpiration: dateExpiration,
+			CertID:             utils.FormatUint(uint64(cert.ID)),
+			CertUUID:           cert.UUID.String(),
+			CertDateEmission:   utils.FormatDate(cert.DateEmission),
+			CertDateExpiration: utils.FormatDate(cert.DateExpiration),
 			OrgEmiDiocese:      org.Diocese,
 			OrgEmiType:         ParseOrgType(org.OrgType),
 			OrgEmiName:         org.Name,
@@ -582,19 +578,13 @@ func DownloadPDFCertificateBaptism(db *gorm.DB) gin.HandlerFunc {
 			RegUserGodmother:   reg.Godmother,
 			RegValidator:       validator.Names + " " + validator.Surnames,
 		}
-		pdfFilepath := createPDFCertificateBaptism(certPDF)
-		if pdfFilepath == "" {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generando el PDF"})
+		pdfBytes, err := createPDFCertificateBaptism(certPDF)
+		if err != nil {
+			log.Printf("Error generating PDF for certificate %d: %s", cert.ID, err)
+			c.String(http.StatusInternalServerError, "Error generando el PDF")
 			return
 		}
-		if _, err := os.Stat(pdfFilepath); err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
-			return
-		}
-		c.Header("Content-Description", "File Transfer")
-		c.Header("Content-Transfer-Encoding", "binary")
-		c.Header("Content-Disposition", "attachment; filename="+filepath.Base(pdfFilepath))
-		c.Header("Content-Type", "application/pdf")
-		c.File(pdfFilepath)
+		c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=certificado-%d.pdf", cert.ID))
+		c.Data(http.StatusOK, "application/pdf", pdfBytes)
 	}
 }
