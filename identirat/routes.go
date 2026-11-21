@@ -88,7 +88,6 @@ func LoginForm(db *gorm.DB) gin.HandlerFunc {
 			username := form.User
 			foundAccount := getAccountByUsername(db, username)
 			if foundAccount != (Account{}) {
-				log.Printf("Account found: ", foundAccount)
 				password := form.Password
 				accountPW := foundAccount.Password
 				if VerifyPassword(accountPW, password) {
@@ -138,7 +137,6 @@ func LoginJSON(db *gorm.DB) gin.HandlerFunc {
 				log.Printf("Account not found")
 				c.JSON(http.StatusUnauthorized, gin.H{"error": "Account or password doesn't match"})
 			} else {
-				log.Println("Account found:", foundAccount)
 				password := json.Password
 				accountPW := foundAccount.Password
 				if VerifyPassword(accountPW, password) {

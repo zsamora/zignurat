@@ -108,23 +108,24 @@ type CertificateBaptism struct {
 
 type CertificateRequest struct {
 	gorm.Model
-	SacrType     uint8
-	Purpose      uint8
-	External     bool
-	Names        string
-	Surnames     string
-	RUT          string
-	DateBirth    time.Time
-	Mail         string
-	Phone        string
-	OrgUnknown   bool
-	OrgID        uint
-	Organization Organization `gorm:"foreignKey:OrgID"`
-	OrgDetails   string
-	DateUnknown  bool
-	DateEvent    time.Time
-	DateFrom     time.Time
-	DateTo       time.Time
+	SacrType      uint8
+	Purpose       uint8
+	External      bool
+	Names         string
+	Surnames      string
+	RUT           string
+	DateBirth     time.Time
+	Mail          string
+	Phone         string
+	OrgUnknown    bool
+	OrgID         uint
+	Organization  Organization `gorm:"foreignKey:OrgID"`
+	OrgDetails    string
+	DateUnknown   bool
+	DateEvent     time.Time
+	DateFrom      time.Time
+	DateTo        time.Time
+	ReferenceCode string
 }
 
 type CertificateBaptismPDF struct {

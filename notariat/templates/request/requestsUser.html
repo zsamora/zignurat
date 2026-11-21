@@ -15,8 +15,14 @@
         </form>
     </div>
 </div>
+{{if .ReferenceCode}}
 <div class="w-full flex justify-center my-6">
-    <form hx-post="/getRequestsByMail" hx-target="#table-content" hx-trigger="submit" hx-swap="outerHTML">
+    <p class="bg-green-100 border border-green-400 text-green-800 rounded py-3 px-4">
+        Tu código de solicitud es <b>{{.ReferenceCode}}</b>. Guárdalo junto a tu mail para consultar tu solicitud.</p>
+</div>
+{{end}}
+<div class="w-full flex justify-center my-6">
+    <form hx-post="/getRequestByCode" hx-target="#table-content" hx-trigger="submit" hx-swap="outerHTML">
     <div class="w-full flex items-center bg-gray-100 p-4 shadow-md">
         <!-- Mail -->
         <div class="mx-2">
@@ -25,6 +31,16 @@
                     <label for="mail"
                         class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Mail </label>
                     <input id="mail" name="mail" type="text" placeholder="Escribir..."
+                       class="bg-white w-full pr-11 h-10 pl-3 py-2 placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md"/>
+                </div>
+            </div>
+        </div>
+        <div class="mx-2">
+            <div class="w-full min-w-m relative">
+                <div class="relative">
+                    <label for="code"
+                        class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"> Código </label>
+                    <input id="code" name="code" type="text" placeholder="Escribir..."
                        class="bg-white w-full pr-11 h-10 pl-3 py-2 placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md"/>
                 </div>
             </div>

@@ -58,6 +58,11 @@
                     Fecha de Evento
                 </p>
             </th>
+            <th class="p-4 border-b border-slate-300 bg-slate-50">
+                <p class="block text-sm font-bold leading-none text-slate-500">
+                    Código
+                </p>
+            </th>
         </tr>
         </thead>
         <tbody>
@@ -99,6 +104,9 @@
                 </td>
                 <td class="p-4 border-b border-slate-200 py-5">
                     <p class="text-sm text-slate-500">{{.DateEvent | parseDate}}</p>
+                </td>
+                <td class="p-4 border-b border-slate-200 py-5">
+                    <p class="text-sm text-slate-500">{{.ReferenceCode}}</p>
                 </td>
             </tr>
         {{end}}

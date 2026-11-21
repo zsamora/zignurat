@@ -1,7 +1,9 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -18,7 +20,7 @@ func RequestRoutes(router *gin.Engine, db *gorm.DB) {
 	router.GET("/requestCertificate", utils.OptionalAuth(2), RequestCertificateForm(db))
 	router.POST("/requestCertificate", SaveRequestCertificate(db))
 	router.GET("/getRequests", utils.OptionalAuth(2), SearchRequest(db))
-	router.POST("/getRequestsByMail", GetRequestsByMail(db))
+	router.POST("/getRequestByCode", GetRequestByCode(db))
 
 	org := router.Group("/org")
 	org.Use(utils.RequireRole(2, accRoleOrganizacion, accRoleValidador))
@@ -44,28 +46,35 @@ func SaveRequestCertificate(db *gorm.DB) gin.HandlerFunc {
 		certPurposeInt, _ := utils.ParseInt(c.PostForm("cert_purpose"))
 		orgIDInt, _ := utils.ParseInt(c.PostForm("org_id"))
 		mail := c.PostForm("mail")
+		code, err := newReferenceCode()
+		if err != nil {
+			log.Printf("Error generating reference code: %s", err)
+			c.String(http.StatusInternalServerError, "Error creando la solicitud")
+			return
+		}
 		request := CertificateRequest{
-			SacrType:    uint8(sacrTypeInt),
-			Purpose:     uint8(certPurposeInt),
-			External:    len(c.PostForm("ext_req")) > 0,
-			Names:       c.PostForm("names"),
-			Surnames:    c.PostForm("surnames"),
-			RUT:         c.PostForm("rut"),
-			DateBirth:   utils.ParseDateForm(c.PostForm("date_birth")),
-			Mail:        mail,
-			Phone:       c.PostForm("phone"),
-			OrgUnknown:  len(c.PostForm("org_unknown")) > 0,
-			OrgID:       uint(orgIDInt),
-			OrgDetails:  c.PostForm("org_details"),
-			DateUnknown: len(c.PostForm("date_unknown")) > 0,
-			DateEvent:   utils.ParseDateForm(c.PostForm("date_event")),
-			DateFrom:    utils.ParseYearForm(c.PostForm("date_from")),
-			DateTo:      utils.ParseYearForm(c.PostForm("date_to")),
+			SacrType:      uint8(sacrTypeInt),
+			Purpose:       uint8(certPurposeInt),
+			External:      len(c.PostForm("ext_req")) > 0,
+			Names:         c.PostForm("names"),
+			Surnames:      c.PostForm("surnames"),
+			RUT:           c.PostForm("rut"),
+			DateBirth:     utils.ParseDateForm(c.PostForm("date_birth")),
+			Mail:          mail,
+			Phone:         c.PostForm("phone"),
+			OrgUnknown:    len(c.PostForm("org_unknown")) > 0,
+			OrgID:         uint(orgIDInt),
+			OrgDetails:    c.PostForm("org_details"),
+			DateUnknown:   len(c.PostForm("date_unknown")) > 0,
+			DateEvent:     utils.ParseDateForm(c.PostForm("date_event")),
+			DateFrom:      utils.ParseYearForm(c.PostForm("date_from")),
+			DateTo:        utils.ParseYearForm(c.PostForm("date_to")),
+			ReferenceCode: code,
 		}
 		createCertificateRequest(db, request)
-		reqs := getCertificateRequestsFromMail(db, mail)
 		c.HTML(http.StatusOK, "requestsUser.html", gin.H{
-			"reqs": reqs,
+			"reqs":          getCertificateRequestsByMailAndCode(db, mail, code),
+			"ReferenceCode": code,
 		})
 	}
 }
@@ -84,10 +93,14 @@ func SearchRequest(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-func GetRequestsByMail(db *gorm.DB) gin.HandlerFunc {
+func GetRequestByCode(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		mail := c.PostForm("mail")
-		reqs := getCertificateRequestsFromMail(db, mail)
+		mail := strings.TrimSpace(c.PostForm("mail"))
+		code := strings.ToUpper(strings.TrimSpace(c.PostForm("code")))
+		var reqs []CertificateRequest
+		if mail != "" && code != "" {
+			reqs = getCertificateRequestsByMailAndCode(db, mail, code)
+		}
 		c.HTML(http.StatusOK, "requestTable", gin.H{
 			"reqs": reqs,
 		})

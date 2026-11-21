@@ -57,7 +57,6 @@ func NotariatController() http.Handler {
 	RegisterRoutes(router, db)
 	CertificateRoutes(router, db)
 	RequestRoutes(router, db)
-	InscriptionRoutes(router, db)
 	InternalRoutes(router, db)
 	return router
 }

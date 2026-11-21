@@ -30,6 +30,10 @@ var (
 		"/requestCertificate": "Solicitar Certificado",
 		"/getRequests":        "Ver Solicitudes",
 	}
+	publicNavbarItems = map[string]string{
+		"/requestCertificate": "Solicitar Certificado",
+		"/getRequests":        "Ver Solicitudes",
+	}
 	accRoleNames = map[uint8]string{
 		accRoleAdministrador: "Administrador",
 		accRoleOrganizacion:  "Organización",
@@ -62,9 +66,9 @@ func Home() gin.HandlerFunc {
 		if role != nil && name != nil {
 			getRoleHome(c, role.(uint8), name.(string))
 		} else {
-			c.HTML(http.StatusUnauthorized, "index.html", gin.H{
+			c.HTML(http.StatusOK, "index.html", gin.H{
 				"LoggedIn":    false,
-				"navbarItems": nil,
+				"navbarItems": publicNavbarItems,
 				"Name":        nil,
 			})
 		}
@@ -82,7 +86,7 @@ func LoginRequest() gin.HandlerFunc {
 		if err := c.ShouldBind(&form); err != nil {
 			c.HTML(http.StatusOK, "index.html", gin.H{
 				"LoggedIn":    false,
-				"navbarItems": nil,
+				"navbarItems": publicNavbarItems,
 				"Name":        nil,
 			})
 		} else {
@@ -90,9 +94,11 @@ func LoginRequest() gin.HandlerFunc {
 			identiratPort := utils.GetConfig("IDENTIRAT_PORT")
 			identiratLogin := utils.GetConfig("IDENTIRAT_LOGIN")
 			requestURL := fmt.Sprintf("http://%s:%s/%s", identiratUrl, identiratPort, identiratLogin)
-			requestJSON := []byte(fmt.Sprintf(`{"user": "%s", "password": "%s"}`, form.User, form.Password))
-			bodyReader := bytes.NewReader(requestJSON)
-			req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
+			var req *http.Request
+			requestJSON, err := json.Marshal(Login{User: form.User, Password: form.Password})
+			if err == nil {
+				req, err = http.NewRequest(http.MethodPost, requestURL, bytes.NewReader(requestJSON))
+			}
 			if err != nil {
 				log.Printf("# Notariat: Failed creating POST request: %s\n", err)
 			} else {
@@ -133,7 +139,7 @@ func LoginRequest() gin.HandlerFunc {
 			utils.ClearSession(c)
 			c.HTML(http.StatusOK, "index.html", gin.H{
 				"LoggedIn":    false,
-				"navbarItems": nil,
+				"navbarItems": publicNavbarItems,
 				"Name":        nil,
 			})
 		}
@@ -145,7 +151,7 @@ func Logout() gin.HandlerFunc {
 		utils.ClearSession(c)
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"LoggedIn":    false,
-			"navbarItems": nil,
+			"navbarItems": publicNavbarItems,
 			"Name":        nil,
 		})
 	}
@@ -180,7 +186,7 @@ func getRoleHome(c *gin.Context, role uint8, name string) {
 		log.Printf("!! No role defined for this value")
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"LoggedIn":    false,
-			"navbarItems": nil,
+			"navbarItems": publicNavbarItems,
 			"Name":        name,
 		})
 	}

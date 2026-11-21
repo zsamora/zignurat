@@ -1,7 +1,9 @@
 package main
 
 import (
+	"crypto/rand"
 	"log"
+	"math/big"
 )
 
 var orgTypes = map[uint8]string{
@@ -73,4 +75,17 @@ func ParseOpType(opTypeID uint16) string {
 	}
 	log.Printf("Key %d not found in operation types", opTypeID)
 	return ""
+}
+
+func newReferenceCode() (string, error) {
+	const alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
+	code := make([]byte, 10)
+	for i := range code {
+		n, err := rand.Int(rand.Reader, big.NewInt(int64(len(alphabet))))
+		if err != nil {
+			return "", err
+		}
+		code[i] = alphabet[n.Int64()]
+	}
+	return string(code), nil
 }

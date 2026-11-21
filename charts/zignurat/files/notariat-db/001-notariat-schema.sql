@@ -146,6 +146,7 @@ CREATE TABLE IF NOT EXISTS certificate_requests (
     date_event    TIMESTAMPTZ,
     date_from     TIMESTAMPTZ,
     date_to       TIMESTAMPTZ,
+    reference_code TEXT,
     created_at    TIMESTAMPTZ,
     updated_at    TIMESTAMPTZ,
     deleted_at    TIMESTAMPTZ,
@@ -155,3 +156,4 @@ CREATE TABLE IF NOT EXISTS certificate_requests (
     );
 
 CREATE INDEX IF NOT EXISTS idx_certificate_requests_deleted_at ON certificate_requests (deleted_at);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_certificate_requests_reference_code ON certificate_requests (reference_code);

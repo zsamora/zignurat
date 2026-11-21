@@ -125,16 +125,6 @@ func ClearSession(c *gin.Context) error {
 	return err
 }
 
-func GetJWTTokenFromHeader(c *gin.Context) string {
-	tokenString := c.GetHeader("Authorization")
-	log.Printf("Token: %s", tokenString)
-	if tokenString == "" {
-		return ""
-	} else {
-		return tokenString
-	}
-}
-
 func CheckJWTToken(jwtToken string, c *gin.Context) (*JWTClaims, error) {
 	token, err := ParseJWTToken(jwtToken)
 	if err == nil {

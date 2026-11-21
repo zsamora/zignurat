@@ -303,6 +303,15 @@ func getCertificateRequestsFromMail(db *gorm.DB, mail string) []CertificateReque
 	log.Printf("N° certificate requests with mail %s in database: %d", mail, result.RowsAffected)
 	return requests
 }
+func getCertificateRequestsByMailAndCode(db *gorm.DB, mail string, code string) []CertificateRequest {
+	var requests []CertificateRequest
+	result := db.Preload("Organization").Where("mail = ? AND reference_code = ?", mail, code).Find(&requests)
+	if result.Error != nil {
+		log.Printf("Error obtaining certificate request by code: %s", result.Error)
+		return nil
+	}
+	return requests
+}
 func getCertificateRequestsFromOrg(db *gorm.DB, orgID uint) []CertificateRequest {
 	var requests []CertificateRequest
 	result := db.Preload("Organization").Find(&requests, CertificateRequest{OrgID: orgID})
