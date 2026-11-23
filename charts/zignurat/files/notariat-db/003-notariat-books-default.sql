@@ -1,8 +1,3 @@
--- Default demo data: two baptism register books for Santo Espíritu Sagrado,
--- with a handful of entries spread across them, plus a smaller set for
--- Capilla San José (used to test that books/registers/validators stay
--- scoped to their own organization).
-
 INSERT INTO books (org_id, book_nr, date_initial, date_final, book_type, created_at, updated_at)
 SELECT id, 12, '1978-01-01', '1988-12-31', 2, now(), now()
 FROM organizations WHERE name = 'Santo Espíritu Sagrado';

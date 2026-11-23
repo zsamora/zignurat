@@ -11,11 +11,6 @@ import (
 	"github.com/zsamora/utils"
 )
 
-// RequestRoutes registers the public certificate-request flow (no account
-// needed to submit a request or look one up by mail) plus the org-side inbox
-// for reviewing requests addressed to that organization. A logged-in Usuario
-// hitting /getRequests gets their own requests auto-scoped by their account's
-// mail instead of an empty search box.
 func RequestRoutes(router *gin.Engine, db *gorm.DB) {
 	router.GET("/requestCertificate", utils.OptionalAuth(2), RequestCertificateForm(db))
 	router.POST("/requestCertificate", SaveRequestCertificate(db))

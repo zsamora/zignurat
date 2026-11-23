@@ -19,7 +19,6 @@ CLAUDE.md
 .DS_Store
 Thumbs.db
 
-# Notariat build artifacts, generated certificates, and local-only PDF assets
 /notariat/notariat
 /notariat/notariat-app
 /notariat/img/*

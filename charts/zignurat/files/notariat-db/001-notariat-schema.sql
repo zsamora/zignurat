@@ -90,10 +90,6 @@ CREATE TABLE IF NOT EXISTS register_baptisms (
     deleted_at       TIMESTAMPTZ
     );
 
--- index_id intentionally has no foreign key: AddRegisterBaptism (notariat/routes.go)
--- writes it before the matching index_baptisms row exists — the index row is
--- only created afterwards, in updateOrInsertIndexBaptism (notariat/db.go). A hard FK
--- here would reject every register-baptism insert.
 CREATE INDEX IF NOT EXISTS idx_register_baptisms_deleted_at ON register_baptisms (deleted_at);
 
 CREATE TABLE IF NOT EXISTS index_baptisms (

@@ -21,7 +21,6 @@ var (
 	}
 )
 
-// AccRole values for module 2 (Notariat), mirroring identirat's notariatRoles map.
 const (
 	accRoleAdministrador uint8 = 1
 	accRoleOrganizacion  uint8 = 2
@@ -129,9 +128,6 @@ func currentOwnerUUID(c *gin.Context) *uuid.UUID {
 	return nil
 }
 
-// currentOwnerOrgID resolves the logged-in account's organization, whether it
-// owns an Organization directly (Organización) or a Member that belongs to
-// one (Validador, Administrador member role, etc).
 func currentOwnerOrgID(db *gorm.DB, c *gin.Context) uint {
 	ownerUUID := currentOwnerUUID(c)
 	if ownerUUID == nil {
@@ -143,8 +139,6 @@ func currentOwnerOrgID(db *gorm.DB, c *gin.Context) uint {
 	return GetMemberFromUUID(db, *ownerUUID).OrgID
 }
 
-// currentValidatorID resolves the logged-in account's own Member ID, used to
-// preselect the validator dropdown when a Validador is creating a certificate.
 func currentValidatorID(db *gorm.DB, c *gin.Context) uint {
 	ownerUUID := currentOwnerUUID(c)
 	if ownerUUID == nil {

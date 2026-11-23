@@ -1,51 +1,93 @@
 # Zignurat
 
-A suite of modules designed to handle identity, registers and documents of individuals and organizations.
+Digital records management and certificate issuing for parish registries.
 
-- **Identirat** — Identity & Access Management. Owns authentication and account roles, acting as the single point of access to the suite.
-- **Notariat** — Parish/diocese registry. Manages register books and baptism records, and generates official PDF certificates (with signature, seal and QR-code verification).
+Parish records still live in paper books. Zignurat lets people request certificates online, and parishes transcribe each record as they answer a request, digitizing their books one request at a time.
+
+![Zignurat demo](docs/notariat_preview.gif)
+
+## Roles
+
+The interface is in Spanish.
+
+| Role | Can do |
+|---|---|
+| Administrador | Manage organizations and members; read every parish's records |
+| Organización | Manage its own books, records and members; see requests addressed to it |
+| Validador | Everything an organization can, plus issue certificates signed as themselves |
+| Usuario | Request certificates and follow their requests |
+| Visitor | Request a certificate and look it up with email and reference code |
+
+## Architecture
+
+```
+identirat/   Identity service: accounts, roles, password checks (bcrypt), JWT issuance
+notariat/    Registry service: organizations, books, baptism records, certificates, requests
+utils/       Shared Go module: authentication middleware and sessions
+charts/      Helm chart: both services, their PostgreSQL StatefulSets and HTTP routes
+k8s/         Cluster-wide setup (GatewayClass)
+```
+
+Users log in to Notariat through Identirat. Each service has its own PostgreSQL database.
 
 ## Tech stack
 
-- Go, Gin, GORM + PostgreSQL (one database per service, provisioned via `charts/zignurat/files`)
-- JWT-based auth shared through the `utils` module
+- Go, Gin, GORM, PostgreSQL 17
+- Server-rendered HTML with htmx, Alpine.js and Tailwind CSS
+- PDF generation with gopdf
 - Kubernetes (minikube), Helm, Gateway API (Envoy Gateway)
 
-## Project structure
+## Running it locally
 
-```
-identirat/   IAM service — accounts, roles, JWT issuance
-notariat/    Parish registry, register books, baptism records and PDF certificates
-utils/       Shared Go module — JWT middleware, config and parsing
-charts/      Helm chart for the whole suite (apps, databases, routes)
-k8s/         Cluster-wide platform setup (GatewayClass)
-```
-
-## Kubernetes (minikube)
+Requirements: Docker, minikube, kubectl, Helm and openssl. Commands are for bash (Linux, macOS or WSL).
 
 ```bash
-# 1. Platform setup (once per cluster)
+# 1. Cluster and platform setup (once)
+minikube start
 helm install eg oci://docker.io/envoyproxy/gateway-helm --version v1.8.1 \
   -n envoy-gateway-system --create-namespace
 kubectl apply -f k8s/platform/gatewayclass.yaml
 
-# 2. Secrets (once per cluster; never committed)
+# 2. Secrets (once, never committed)
 kubectl create namespace zignurat
 kubectl -n zignurat create secret generic zignurat-secrets \
   --from-literal=JWT_SECRET="$(openssl rand -hex 32)" \
   --from-literal=SESSION_SECRET="$(openssl rand -hex 32)" \
-  --from-literal=IDENTIRAT_DB_PW=changeme \
-  --from-literal=NOTARIAT_DB_PW=changeme \
+  --from-literal=IDENTIRAT_DB_PW="$(openssl rand -hex 16)" \
+  --from-literal=NOTARIAT_DB_PW="$(openssl rand -hex 16)" \
   --from-literal=INTERNAL_TOKEN="$(openssl rand -hex 32)"
 
-# 3. Build images and deploy
-minikube image build -t zignurat/identirat:<version> -f identirat/Dockerfile .
-minikube image build -t zignurat/notariat:<version> -f notariat/Dockerfile .
-helm install zignurat charts/zignurat -n zignurat
+# 3. Build the images inside minikube and deploy
+minikube image build -t zignurat/identirat:local -f identirat/Dockerfile .
+minikube image build -t zignurat/notariat:local -f notariat/Dockerfile .
+helm install zignurat charts/zignurat -n zignurat \
+  --set apps.identirat.tag=local --set apps.notariat.tag=local
 
-# 4. Access (keep running)
+# 4. Expose the Gateway (keep it running)
 minikube tunnel
 ```
 
-- **Identirat**: http://identirat.localhost
-- **Notariat**: http://notariat.localhost
+`minikube tunnel` may ask for your password. Then open:
+
+- Identirat: http://identirat.localhost
+- Notariat: http://notariat.localhost
+
+### Demo accounts
+
+Demo data with two fictional parishes is loaded automatically.
+
+| Account | Password | Role |
+|---|---|---|
+| admin@identirat.com | identiratadmin123 | Administrador (Identirat) |
+| admin@notariat.com | notariatadmin123 | Administrador (Notariat) |
+| org@notariat.com | notariatorg123 | Organización (Santo Espíritu Sagrado) |
+| validator@notariat.com | notariatvalidator123 | Validador (Santo Espíritu Sagrado) |
+| user@notariat.com | notariatuser123 | Usuario |
+
+## Roadmap
+
+- Database migrations, run as a Helm hook
+- CI: tests, `go vet`, `helm lint`, image build and vulnerability scan
+- Small, non-root container images
+- Per-validator signatures and per-parish seals, uploaded through the app
+- Public certificate verification via QR code
